@@ -4,6 +4,7 @@ const {
     Events,
     GatewayIntentBits
 } = require('discord.js');
+const cron = require('node-cron');
 const token = process.env.DISCORD_TOKEN
 const noob = '740297286562873404'
 

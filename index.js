@@ -20,6 +20,9 @@ const client = new Client({
 
 client.once(Events.ClientReady, c => {
     console.log(`Ready! Logged in as ${c.user.tag}`);
+    const generalChat = client.channel.cache.get('538756978420219905')
+    generalChat.send.message('venão lindo e cheiroso')
+
 
     const channelId = '538757121538392075';
     const messageId = '538759078105841664'; // id da mensagem que deseja remover as reações

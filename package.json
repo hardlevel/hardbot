@@ -1,0 +1,20 @@
+{
+  "dependencies": {
+    "discord.js": "^14.9.0",
+    "dotenv": "^16.0.3",
+    "node-cron": "^3.0.2"
+  },
+  "name": "hardbot",
+  "version": "1.0.0",
+  "description": "bot para o server do discord do hardlevel",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": [
+    "hardbod"
+  ],
+  "author": "venão",
+  "license": "ISC",
+  "repository": "github:hardlevel/hardbot"
+}

@@ -87,7 +87,7 @@ client.on('messageCreate', message => {
 });
 
 client.on(Events.MessageReactionAdd, async (reaction, user) => {
-    reaction.remove()
+    //reaction.remove()
     
     let messageId = '538759078105841664'
     // async function getReactions(){
@@ -116,21 +116,21 @@ client.on(Events.MessageReactionAdd, async (reaction, user) => {
 async function deleteAllMessages(channel) {
     const messages = await channel.messages.fetch({ limit: 100 });
     if (messages.size > 0) {
-      await channel.bulkDelete(messages);
-      await deleteAllMessages(channel);
+        await channel.bulkDelete(messages);
+        await deleteAllMessages(channel);
     }
-  }
-  
+    }
+
   // Agendando a tarefa para rodar todo domingo às 00h
   cron.schedule('0 0 * * 0', async () => {
-    const channel = client.channels.cache.get(channelId);
+    const channel = client.channels.cache.get('1072497124597575751');
     if (channel) {
-      console.log(`Deleting all messages in channel ${channel.name}`);
-      await deleteAllMessages(channel);
-      console.log(`All messages deleted from channel ${channel.name}`);
+        console.log(`Deleting all messages in channel ${channel.name}`);
+        await deleteAllMessages(channel);
+        console.log(`All messages deleted from channel ${channel.name}`);
     } else {
-      console.log(`Channel with ID ${channelId} not found`);
+        console.log(`Channel with ID ${channelId} not found`);
     }
-  });
+});
 
 client.login(token);

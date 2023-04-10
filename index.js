@@ -69,6 +69,7 @@ client.on('messageCreate', message => {
                 message.member.noobTries = 0;
             } else {
                 // Apaga a mensagem anterior do bot
+                const member = message.member;
                 const botMessages = message.channel.messages.cache.filter(msg => msg.author.id === client.user.id);
                 botMessages.forEach(msg => msg.delete());
                 message.delete();
@@ -77,6 +78,13 @@ client.on('messageCreate', message => {
 
                 // Incrementa o contador de tentativas do usuário
                 message.member.noobTries++;
+
+                member.send(`
+                    Por favor, leia e aceite as regras na sala ${regrasChannel} antes de enviar mensagens nas salas. 
+                    Se atente em mandar as mensagens nas salas corretas, o fórum também tem regras importantes
+                    , é necessário que você leia as regras para ajudar a manter o server organizado.
+                    Siga o canal nas redes sociais, outras plataformas e outros canais em https://linktr.ee/hardlevel
+                    `);
             }
         } catch (error) {
             console.error(`Ocorreu um erro ao tentar apagar a mensagem: ${error}`);

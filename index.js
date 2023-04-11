@@ -2,11 +2,22 @@ require('dotenv').config();
 const {
     Client,
     Events,
-    GatewayIntentBits
+    GatewayIntentBits,
+    ActionRowBuilder,
+    ButtonBuilder, 
+    ButtonStyle,
+    channelMention,
+    MessageActionRow, 
+    MessageButton
 } = require('discord.js');
+
+const { rulesButton, buttonRules } = require('./rules_button.js');
+
 const cron = require('node-cron');
 const token = process.env.DISCORD_TOKEN
 const noob = '740297286562873404'
+
+//const { addButtonToMessage } = require('rules_button'); // Importa a função do arquivo button.js
 
 const client = new Client({
     intents: [
@@ -19,37 +30,130 @@ const client = new Client({
 });
 
 client.once(Events.ClientReady, c => {
+    //console.log(rulesButton)
+    //const guild = client.guilds.cache;
+    //console.log(guild)
+    //console.log(module)
     console.log(`Ready! Logged in as ${c.user.tag}`);
-    const generalChat = client.channel.cache.get('538756978420219905')
-    generalChat.send.message('venão lindo e cheiroso')
 
-
-    const channelId = '538757121538392075';
-    const messageId = '538759078105841664'; // id da mensagem que deseja remover as reações
-    const channel = client.channels.cache.get(channelId);
-
-    /*client.channels.fetch('538757121538392075')
-    .then(channel => console.log(channel.name))
-    .catch(console.error);*/
+    const rulesChannel = client.guilds.cache.first().rulesChannelId
+    const channel = client.channels.cache.get(rulesChannel)
 
     
     async function reactions(){
-        const message = await channel.messages.fetch('538759078105841664')
+        const message = await channel.messages.fetch('538759078105841664')    
         try{
+            //remove todas as reações da primeira mensagem na sala de regras
             message.reactions.removeAll()
             console.log('todas reações removidas')
+
+
         } catch(error) {
             console.log(error)
         }
     }
 
+    async function removeReactions() {
+        const message = await channel.messages.fetch('727128017318707220');
+        try {
+            // Loop através de todas as reações na mensagem
+            for (const reaction of message.reactions.cache.values()) {
+                const emojiName = reaction.emoji.name.toLowerCase(); // Converte o nome da emoji para letras minúsculas
+    
+                // Verifica se a emoji é diferente de 'thumbsup' e 'white_check_mark'
+                if (emojiName !== '✅' && emojiName !== '👍') {
+                    // Obtém a lista de usuários que reagiram com a emoji
+                    const users = await reaction.users.fetch();
+                    
+                    
+                    //Remove a reação de todos os usuários, exceto se for a própria bot
+                    users.forEach(async (user) => {
+                        if (user.id !== client.user.id) {
+                            await reaction.users.remove(user);
+                        }
+                    });
+                    // Registra a remoção da reação no console
+                    console.log(`Reação removida: ${emojiName}`);
+                }
+            }
+    
+            // Registro de conclusão da remoção das reações no console
+            console.log('Todas as reações não desejadas foram removidas.');
+        } catch (error) {
+            console.error(`Ocorreu um erro ao remover as reações: ${error}`);
+        }
+
+        //message.edit({components:[rulesButton]})
+    }
+
+    async function addButton() {
+        const channelId = client.guilds.cache.first().rulesChannelId
+        const channel = client.channels.cache.get(rulesChannel)
+        let messageId = ''
+        
+        const acceptMessageTemplate = `
+            Antes de perguntar algo, consulte os canais ${channelMention('538757439655378944')} ${channelMention('699291742536597534')} ${channelMention('540970007165665293')} ${channelMention('538757509037686794')}
+            Clique no botão abaixo para aceitar as`;
+
+            try {
+                //console.log(channelId)
+                let counter = 0
+                const messageList = await channel.messages.fetch().then(messages => {
+                    //console.log(`Received ${messages.size} messages`);
+                    //Iterate through the messages here with the variable "messages".
+                    messages.forEach(message => {                        
+                        if(message.content.trim() == acceptMessageTemplate.trim()){
+                           counter++
+                           messageId = message.id;
+                        }
+                    })
+                  })
+
+                if(counter == 0){
+                    const message = channel.send(acceptMessageTemplate);
+                    messageId = message.id;
+                } else {
+                    console.log(`A mensagem já existe ${channelId}`)
+                }
+              
+            
+                // Cria a ação de linha de mensagem com o botão do módulo
+
+
+                // Edita a mensagem existente ou a mensagem recém-criada para adicionar o componente
+                const message = await channel.messages.fetch(messageId); // Obtém a mensagem com a ID
+                message.edit({ components: [
+                    {
+                        "type": 1,
+                        "components": [
+                          {
+                            "style": 1,
+                            "label": `Eu li e aceito as regras`,
+                            "custom_id": `accept_yes`,
+                            "disabled": false,
+                            "emoji": {
+                              "id": null,
+                              "name": `✅`
+                            },
+                            "type": 2
+                          }                          
+                        
+                ] }]}); // Edita a mensagem para adicionar o componente                
+                console.log(`Mensagem criada/editada com ID: ${messageId}`);
+              } catch (error) {
+                console.error('Ocorreu um erro:', error);
+              }
+    }
     reactions()
+    removeReactions()
+    addButton()
 });
 
-client.on('messageCreate', message => {
+client.on('messageCreate', message => { if((message.member) && (!message.user.bot)) { 
     const member = message.member;
     const highestRole = member.roles.highest;
     const regrasChannel = message.guild.channels.cache.find(channel => channel.name === 'regras');
+    const sala = client.channels.cache.get(message.channelId).name
 
     // Inicializa a variável de tentativas do usuário
     if (!message.member.noobTries) message.member.noobTries = 0;
@@ -91,8 +195,9 @@ client.on('messageCreate', message => {
         }
     }
 
-    console.log(`${message.author.tag} tem o cargo ${highestRole.name}`);
-});
+    console.log(`${message.author.tag} tem o cargo ${highestRole.name} sala ${client.channels.cache.get(message.channelId)} na sala ${sala}`);
+    
+}});
 
 client.on(Events.MessageReactionAdd, async (reaction, user) => {
     //reaction.remove()
@@ -116,7 +221,7 @@ client.on(Events.MessageReactionAdd, async (reaction, user) => {
     if (!member.roles.cache.has(noobRole.id)) return;
 
     // Remove o cargo 'noob' e adiciona o cargo 'membro'
-    //await member.roles.remove(noobRole);
+    await member.roles.remove(noobRole);
     await member.roles.add(membroRole);
 });
 
@@ -140,5 +245,25 @@ async function deleteAllMessages(channel) {
         console.log(`Channel with ID ${channelId} not found`);
     }
 });
+
+client.on('interactionCreate', async (interaction) => {
+    // Verificar se a interação é um clique de botão
+    if (!interaction.isButton()) return;
+  
+    // Verificar se o ID do botão é igual ao que você definiu na etapa 4
+    if (interaction.customId === 'accept_yes') {
+      // Remover o cargo antigo do membro
+      const membro = interaction.member;
+      const cargoAntigo = membro.roles.cache.get('740297286562873404');
+      await membro.roles.remove(cargoAntigo);
+  
+      // Adicionar o novo cargo ao membro
+      const novoCargo = interaction.guild.roles.cache.get('727127442061393991');
+      await membro.roles.add(novoCargo);
+  
+      // Enviar uma resposta para o botão informando que a ação foi realizada com sucesso
+      await interaction.reply({ content: 'Seja bem vindo ao server oficial HardLevel!', ephemeral: true });
+    }
+  });
 
 client.login(token);

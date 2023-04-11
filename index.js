@@ -149,7 +149,7 @@ client.once(Events.ClientReady, c => {
     addButton()
 });
 
-client.on('messageCreate', message => { if((message.member) && (!message.user.bot)) { 
+client.on('messageCreate', message => { if((message.member) && (message.member.user.bot == false)){    
     const member = message.member;
     const highestRole = member.roles.highest;
     const regrasChannel = message.guild.channels.cache.find(channel => channel.name === 'regras');
@@ -197,7 +197,8 @@ client.on('messageCreate', message => { if((message.member) && (!message.user.bo
 
     console.log(`${message.author.tag} tem o cargo ${highestRole.name} sala ${client.channels.cache.get(message.channelId)} na sala ${sala}`);
     
-}});
+    }
+});
 
 client.on(Events.MessageReactionAdd, async (reaction, user) => {
     //reaction.remove()

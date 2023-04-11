@@ -259,7 +259,7 @@ client.on('interactionCreate', async (interaction) => {
     if (interaction.customId === 'accept_yes') {
         // Remover o cargo antigo do membro
         const membro = interaction.member;
-        if (interaction.member.has('740297286562873404')) {
+        if (membro.roles.cache.some(role => role.name === 'noob')){
             const cargoAntigo = membro.roles.cache.get('740297286562873404');
             await membro.roles.remove(cargoAntigo);
 
@@ -268,9 +268,9 @@ client.on('interactionCreate', async (interaction) => {
             await membro.roles.add(novoCargo);
 
             // Enviar uma resposta para o botão informando que a ação foi realizada com sucesso
-            await interaction.reply({ content: 'Seja bem vindo ao server oficial HardLevel!', ephemeral: true });
+            await interaction.reply({ content: 'Seja bem vindo ao server oficial HardLevel! Não se esqueça de seguir os canais adicionais e redes sociais aqui https://linktr.ee/hardlevel', ephemeral: true });
         } else {
-            await interaction.reply({ content: 'Você já aceitou as regras anteriormente!', ephemeral: true });
+            await interaction.reply({ content: 'Você já aceitou as regras anteriormente! Não se esqueça de seguir os canais adicionais e redes sociais aqui https://linktr.ee/hardlevel', ephemeral: true });
         }
     }
 });

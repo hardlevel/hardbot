@@ -157,6 +157,33 @@ client.once(Events.ClientReady, c => {
     reactions()
     removeReactions()
     addButton()
+
+	  cron.schedule('0 8 * * *', () => {
+		// Use uma API de gifs para obter uma gif de bom dia (neste exemplo, usamos a API do Giphy)
+		fetch('https://api.giphy.com/v1/gifs/random?tag=bom%20dia&api_key=SUA_CHAVE_DE_API_DO_GIPHY_AQUI')
+		  .then(res => res.json())
+		  .then(data => {
+		    // Verifique se a resposta da API é válida
+		    if (data && data.data && data.data.images && data.data.images.original && data.data.images.original.url) {
+		      const gifUrl = data.data.images.original.url;
+		      // Enviar a gif para o canal do Discord
+		      const channel = client.channels.cache.get(channelId);
+		      if (channel && channel.isText()) {
+		        channel.send(`Bom dia! Aqui está uma gif para você! ${gifUrl}`);
+		      }
+		    }
+		  })
+		  .catch(error => {
+		    console.error('Erro ao obter a gif de bom dia:', error);
+		  });
+	  });
+});
+
+// Faça o login do bot com o token
+client.login(token);
+
+Certifique-se de substituir SEU_TOKEN_DE_BOT_DO_DISCORD_AQUI pelo token do seu bot do Discord e ID_DO_CANAL_DO_DISCORD_AQUI pelo ID do canal onde você deseja que a gif de bom dia seja enviada. Além disso, você também precisará de uma chave de API do Giphy para obter as gifs de bom dia. Você pode obter uma chave de API gratuitamente registrando-se no site do Giphy (https://developers.giphy.com/).
+
 });
 
 client.on('messageCreate', async message => {

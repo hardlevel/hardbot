@@ -11,11 +11,17 @@ const {
     MessageButton
 } = require('discord.js');
 
+const util = require('util');
 const { rulesButton, buttonRules } = require('./rules_button.js');
-
+let regrasChannel = ''
 const cron = require('node-cron');
 const token = process.env.DISCORD_TOKEN
 const noob = '740297286562873404'
+const serverId = '538756064783499265'
+const botId = '1063528592648192011'
+
+const urlRegex = require('url-regex'); // Importar a biblioteca de análise de URLs
+const axios = require('axios')
 
 //const { addButtonToMessage } = require('rules_button'); // Importa a função do arquivo button.js
 
@@ -34,6 +40,7 @@ client.once(Events.ClientReady, c => {
     //const guild = client.guilds.cache;
     //console.log(guild)
     //console.log(module)
+    regrasChannel = client.guilds.cache.get(serverId).channels.cache.find(channel => channel.name === 'regras');
     console.log(`Ready! Logged in as ${c.user.tag}`);
 
     const rulesChannel = client.guilds.cache.first().rulesChannelId
@@ -152,11 +159,22 @@ client.once(Events.ClientReady, c => {
     addButton()
 });
 
-client.on('messageCreate', message => {
+client.on('messageCreate', async message => {
+    const rulesTxt = `
+    Olá ${message.author.name}, Por favor, leia e aceite as regras na sala ${regrasChannel} antes de enviar mensagens nas salas. 
+    Se atente em mandar as mensagens nas salas corretas, o fórum também tem regras importantes
+    , é necessário que você leia as regras para ajudar a manter o server organizado.
+    Siga o canal nas redes sociais, outras plataformas e outros canais em https://linktr.ee/hardlevel
+    `
+    //if (message.member.user.id == botId) {
+        //console.log(message)
+        
+    //}
+
     if ((message.member) && (message.member.user.bot == false)) {
         const member = message.member;
         const highestRole = member.roles.highest;
-        const regrasChannel = message.guild.channels.cache.find(channel => channel.name === 'regras');
+        
         const sala = client.channels.cache.get(message.channelId).name
 
         // Inicializa a variável de tentativas do usuário
@@ -178,12 +196,14 @@ client.on('messageCreate', message => {
                 } else {
                     // Apaga a mensagem anterior do bot
                     const member = message.member;
-                    const botMessages = message.channel.messages.cache.filter(msg => msg.author.id === client.user.id);
+                    /*const botMessages = message.channel.messages.cache.filter(msg => msg.author.id === client.user.id);
                     botMessages.forEach(msg => msg.delete());
-                    message.delete();
+                    message.delete();*/
                     // Envia uma mensagem solicitando que o usuário leia e aceite as regras
-                    message.channel.send(`<@${member.user.id}>, vai com calma ai fera, você ainda é Noob nesse server, leia e aceite as ${regrasChannel} reagindo com :thumbsup: ou :white_check_mark: antes de mandar mensagens nas salas!`);
-
+                    const reply = message.channel.send(`<@${member.user.id}>, vai com calma ai fera, você ainda é Noob nesse server, leia e aceite as ${regrasChannel} reagindo com :thumbsup: ou :white_check_mark: antes de mandar mensagens nas salas!`);
+                    message.delete
+                    const msgId = (await reply).id
+                    await proccessBotMessage(reply.id, message.content, message.channelId, botId)
                     // Incrementa o contador de tentativas do usuário
                     message.member.noobTries++;
 
@@ -200,7 +220,15 @@ client.on('messageCreate', message => {
         }
 
         console.log(`${message.author.tag} tem o cargo ${highestRole.name} sala ${client.channels.cache.get(message.channelId)} na sala ${sala}`);
+        if (message.channel.id != '786263907207348244') {
+            const content = message.content;
+            const urls = content.match(urlRegex()); // Encontrar URLs na mensagem usando a regex
 
+            if (urls) {
+                // Se a mensagem contiver URLs, chamar a função de tratamento
+                tratarUrls(urls, message);
+            }
+        }
     }
 });
 
@@ -217,7 +245,7 @@ client.on(Events.MessageReactionAdd, async (reaction, user) => {
     if (user.bot) return; // Ignora reações de bots
 
     // Verifica se a reação foi em uma mensagem nas regras
-    const regrasChannel = reaction.message.guild.channels.cache.find(channel => channel.name === 'regras');
+    
     if (reaction.message.channel.id !== regrasChannel.id) return;
     // Verifica se a reação é de um usuário com o cargo 'noob'
     const member = await reaction.message.guild.members.fetch(user.id);
@@ -259,7 +287,7 @@ client.on('interactionCreate', async (interaction) => {
     if (interaction.customId === 'accept_yes') {
         // Remover o cargo antigo do membro
         const membro = interaction.member;
-        if (membro.roles.cache.some(role => role.name === 'noob')){
+        if (membro.roles.cache.some(role => role.name === 'noob')) {
             const cargoAntigo = membro.roles.cache.get('740297286562873404');
             await membro.roles.remove(cargoAntigo);
 
@@ -274,5 +302,97 @@ client.on('interactionCreate', async (interaction) => {
         }
     }
 });
+
+
+// Função de tratamento de URLs
+function tratarUrls(urls, message) {
+    const hardlevel = 'UCFUTYcj_6fwrw207-YAghLA'
+    // Aqui você pode implementar a lógica de tratamento das URLs
+    // por exemplo, enviar uma resposta com informações ou realizar
+    // alguma ação com as URLs encontradas
+
+    // Exemplo: Enviar uma resposta com as URLs encontradas
+    const urlsStr = urls.join('\n'); // Converter o array de URLs em uma string
+    // Expressão regular para verificar se a URL é um vídeo do YouTube
+    const youtubeRegex = /^(?:(?:https?:\/\/)?(?:www\.)?(?:youtu\.be\/([\w-]+))|(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?(?=.*v=([\w-]+))(?:\S+)?|embed\/([\w-]+))(?:\S+)?\/?))$/;
+    // Verificar se a URL corresponde ao padrão de URL do YouTube ou ao formato encurtado
+    if (urlsStr.match(youtubeRegex)) {
+        console.log('A URL é um vídeo do YouTube válido.');
+        // Faça o que você precisa fazer quando a URL for um vídeo do YouTube válido
+        verificarCanalDoVideo(urlsStr, message)
+        return true;
+    } else {
+        console.log('A URL não é um vídeo do YouTube válido.');
+        return false;
+    }
+    // message.reply(`Foram encontradas as seguintes URLs:\n${urlsStr}`);
+    // message.delete()
+}
+
+async function verificarCanalDoVideo(videoUrl, message) {
+    try {
+        const videoTxt = `Esse vídeo não é dos canais HardLevel, portanto não pode ser compartilhado neste server, por favor leia as ${regrasChannel}`
+        const yt_api = process.env.YT_API_KEY
+        // Extrair o ID do vídeo da URL
+        const videoId = obterIdDoVideo(videoUrl);
+        const member = message.member.id
+        console.log(videoId)
+        // Fazer requisição à API do YouTube para obter informações do vídeo
+        const response = await axios.get(`https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${videoId}&key=${yt_api}`);
+        const video = response.data.items[0]; // Obter o objeto de informações do vídeo
+
+        // Verificar se o canal do vídeo é igual a 'UCFUTYcj_6fwrw207-YAghLA'
+        if (video.snippet.channelId === 'UCFUTYcj_6fwrw207-YAghLA') {
+            console.log('O canal do vídeo é igual a "UCFUTYcj_6fwrw207-YAghLA"');
+            // Faça o que você precisa fazer quando o canal do vídeo for igual a 'UCFUTYcj_6fwrw207-YAghLA'
+        } else {            
+            console.log('O canal do vídeo não é igual a "UCFUTYcj_6fwrw207-YAghLA"');
+            //const botMessages = message.channel.messages.cache.filter(msg => msg.author.id === client.user.id);
+            //await botMessages.forEach(msg => msg.delete());        
+            const reply = await message.reply(`Esse vídeo não é dos canais HardLevel, portanto não pode ser compartilhado neste server, por favor leia as ${regrasChannel}`)
+            await message.delete()
+            const msgId = reply.id
+            await proccessBotMessage(reply.id, message.content, message.channelId, botId)
+        }
+    } catch (error) {
+        console.error('Ocorreu um erro ao verificar o canal do vídeo:', error);
+    }
+}
+
+// Função auxiliar para extrair o ID do vídeo da URL
+function obterIdDoVideo(videoUrl) {
+    // Verificar se a URL é um URL encurtado do YouTube (youtu.be)
+    if (videoUrl.includes('youtu.be/')) {
+        const match = videoUrl.match(/youtu\.be\/([\w-]+)/);
+        return match ? match[1] : null;
+    }
+
+    // Caso contrário, verificar se a URL é um URL padrão do YouTube (youtube.com/watch?v=)
+    const url = new URL(videoUrl);
+    if (url.hostname.includes('youtube.com') && url.pathname === '/watch') {
+        return url.searchParams.get('v');
+    }
+
+    // Retornar null se a URL não for um URL válido do YouTube
+    return null;
+}
+
+async function proccessBotMessage(id, content, channelId, botId){
+    try {
+        const channel = await client.channels.fetch(channelId)
+        const messages = await channel.messages.fetch({ limit: 10 });
+        const botMessages = await messages.filter(msg => msg.author.id === botId)
+        console.log(util.inspect(botMessages, { depth: null }))
+        for (const msg of botMessages.values()) {
+            console.log('mensagem ignorada ' + id);
+            if (msg.id !== id) {
+                console.log('Mensagem a ser excluída:', msg.id);
+                await msg.delete();
+            }
+        }
+    } catch (error) {
+        console.error('Ocorreu um erro: ', error);
+    }
+}
 
 client.login(token);

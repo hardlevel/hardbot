@@ -184,7 +184,6 @@ client.login(token);
 
 //Certifique-se de substituir SEU_TOKEN_DE_BOT_DO_DISCORD_AQUI pelo token do seu bot do Discord e ID_DO_CANAL_DO_DISCORD_AQUI pelo ID do canal onde você deseja que a gif de bom dia seja enviada. Além disso, você também precisará de uma chave de API do Giphy para obter as gifs de bom dia. Você pode obter uma chave de API gratuitamente registrando-se no site do Giphy (https://developers.giphy.com/).
 
-});
 
 client.on('messageCreate', async message => {
     const rulesTxt = `

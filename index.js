@@ -160,7 +160,7 @@ client.once(Events.ClientReady, c => {
 
 	  cron.schedule('0 8 * * *', () => {
 		// Use uma API de gifs para obter uma gif de bom dia (neste exemplo, usamos a API do Giphy)
-		fetch('https://api.giphy.com/v1/gifs/random?tag=bom%20dia&api_key=SUA_CHAVE_DE_API_DO_GIPHY_AQUI')
+		fetch('https://api.giphy.com/v1/gifs/random?tag=bom%20dia&api_key=BOcS2Rlvdy2JapFW7gy36Kc2vwyI5xRe')
 		  .then(res => res.json())
 		  .then(data => {
 		    // Verifique se a resposta da API é válida

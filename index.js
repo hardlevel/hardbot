@@ -6,6 +6,7 @@ const {
     ActionRowBuilder,
     ButtonBuilder,
     ButtonStyle,
+    Message,
     channelMention,
     MessageActionRow,
     MessageButton
@@ -21,7 +22,10 @@ const serverId = '538756064783499265'
 const botId = '1063528592648192011'
 
 const urlRegex = require('url-regex'); // Importar a biblioteca de análise de URLs
-const axios = require('axios')
+const axios = require('axios');
+const { stringify } = require('querystring');
+
+var tentativas = {}
 
 //const { addButtonToMessage } = require('rules_button'); // Importa a função do arquivo button.js
 
@@ -186,6 +190,21 @@ client.login(token);
 
 
 client.on('messageCreate', async message => {
+        
+    if (message.member == '1063528592648192011') {
+        const channel = await client.channels.fetch(message.channelId);
+        const messages = await channel.messages.fetch({ limit: 100 });
+        const botMessages = messages.filter(message => message.author.id === '1063528592648192011');
+        const messageCount = botMessages.size;
+        
+
+        if (messageCount > 1) {
+            const messagesToDelete = Array.from(botMessages.values()).slice(1, messageCount - 1);
+            channel.bulkDelete(messagesToDelete);
+        }
+        
+    }
+
     const rulesTxt = `
     Olá ${message.author.name}, Por favor, leia e aceite as regras na sala ${regrasChannel} antes de enviar mensagens nas salas. 
     Se atente em mandar as mensagens nas salas corretas, o fórum também tem regras importantes
@@ -197,49 +216,46 @@ client.on('messageCreate', async message => {
         
     //}
 
+
     if ((message.member) && (message.member.user.bot == false)) {
         const member = message.member;
         const highestRole = member.roles.highest;
         
         const sala = client.channels.cache.get(message.channelId).name
 
-        // Inicializa a variável de tentativas do usuário
-        if (!message.member.noobTries) message.member.noobTries = 0;
+        //if (member && !member.data.has('noobCounter')) {
+        //    member.data.set('noobCounter', 0);
+        //} 
 
         if (highestRole.name === 'noob') {
             try {
-                if (message.member.noobTries >= 3) {
-                    // Apaga a mensagem do usuário
-                    message.delete();
-
-                    // Menciona o usuário e envia o comando de warn
-                    //message.channel.send(`<@${member.user.id}>`);
-                    //message.channel.send(`<!warn> <@${member.user.id}> insistiu em mandar mensagens sem ler as regras.`);
-                    member.timeout(1000_000);
-
-                    // Reinicia o contador de tentativas do usuário
-                    message.member.noobTries = 0;
+                if (!tentativas.hasOwnProperty(member.id)) {
+                    tentativas[member.id] = 1;
+                    console.log('primeiro if ' + tentativas[member.id])
                 } else {
-                    // Apaga a mensagem anterior do bot
-                    const member = message.member;
-                    /*const botMessages = message.channel.messages.cache.filter(msg => msg.author.id === client.user.id);
-                    botMessages.forEach(msg => msg.delete());
-                    message.delete();*/
-                    // Envia uma mensagem solicitando que o usuário leia e aceite as regras
-                    const reply = message.channel.send(`<@${member.user.id}>, vai com calma ai fera, você ainda é Noob nesse server, leia e aceite as ${regrasChannel} reagindo com :thumbsup: ou :white_check_mark: antes de mandar mensagens nas salas!`);
-                    message.delete
-                    const msgId = (await reply).id
-                    await proccessBotMessage(reply.id, message.content, message.channelId, botId)
-                    // Incrementa o contador de tentativas do usuário
-                    message.member.noobTries++;
-
+                    console.log('entrou no eslse')
+                    tentativas[member.id]++; 
+                    
+                    if (tentativas[member.id] > 3) {                 
+                    message.delete();
                     member.send(`
-                    Por favor, leia e aceite as regras na sala ${regrasChannel} antes de enviar mensagens nas salas. 
-                    Se atente em mandar as mensagens nas salas corretas, o fórum também tem regras importantes
-                    , é necessário que você leia as regras para ajudar a manter o server organizado.
-                    Siga o canal nas redes sociais, outras plataformas e outros canais em https://linktr.ee/hardlevel
-                    `);
+Por favor, leia e aceite as regras na sala ${regrasChannel} antes de enviar mensagens nas salas. \n
+Se atente em mandar as mensagens nas salas corretas, o fórum também tem regras importantes \n
+, é necessário que você leia as regras para ajudar a manter o server organizado. \n
+Você recebeu um mute por insistir em mandar mensagens sem ter lido e aceitado as regras! Evite tomar um ban! \n
+Siga o canal nas redes sociais, outras plataformas e outros canais em https://linktr.ee/hardlevel
+`);
+                    member.timeout(1000_000);
+                    tentativas[member.id] = 0; 
+                    console.log(member.author.name + ' mutado')
+                    return
+                    }                    
                 }
+                const reply = message.channel.send(`<@${member.user.id}>, vai com calma ai fera, você ainda é não leu e aceitou as regras do server, leia e aceite as ${regrasChannel} reagindo com :thumbsup: ou :white_check_mark: antes de mandar mensagens nas salas! Se insistir receberá um mute. Tentativas: ${tentativas[member.id]}`);
+                message.delete()
+                const msgId = (await reply).id
+
+                console.log('tentativas do noob ' + tentativas[member.id]) 
             } catch (error) {
                 console.error(`Ocorreu um erro ao tentar apagar a mensagem: ${error}`);
             }
@@ -305,7 +321,7 @@ cron.schedule('0 0 * * 0', async () => {
     }
 });
 
-client.on('interactionCreate', async (interaction) => {
+client.once('interactionCreate', async (interaction) => {
     // Verificar se a interação é um clique de botão
     if (!interaction.isButton()) return;
 
@@ -318,7 +334,7 @@ client.on('interactionCreate', async (interaction) => {
             await membro.roles.remove(cargoAntigo);
 
             // Adicionar o novo cargo ao membro
-            const novoCargo = interaction.guild.roles.cache.get('727127442061393991');
+            const novoCargo = await interaction.guild.roles.cache.get('727127442061393991');
             await membro.roles.add(novoCargo);
 
             // Enviar uma resposta para o botão informando que a ação foi realizada com sucesso

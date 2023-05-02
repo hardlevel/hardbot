@@ -13,7 +13,6 @@ const {
 } = require('discord.js');
 
 const util = require('util');
-const { rulesButton, buttonRules } = require('./rules_button.js');
 let regrasChannel = ''
 const cron = require('node-cron');
 const token = process.env.DISCORD_TOKEN
@@ -39,239 +38,19 @@ const client = new Client({
     ],
 });
 
+//importar modulos
+const { handleMessage } = require('./messageHandler');
+const { startBot } = require('./startBot');
+
 client.once(Events.ClientReady, c => {
-    //console.log(rulesButton)
-    //const guild = client.guilds.cache;
-    //console.log(guild)
-    //console.log(module)
-    regrasChannel = client.guilds.cache.get(serverId).channels.cache.find(channel => channel.name === 'regras');
-    console.log(`Ready! Logged in as ${c.user.tag}`);
-
-    const rulesChannel = client.guilds.cache.first().rulesChannelId
-    const channel = client.channels.cache.get(rulesChannel)
-
-
-    async function reactions() {
-        const message = await channel.messages.fetch('538759078105841664')
-        try {
-            //remove todas as reações da primeira mensagem na sala de regras
-            message.reactions.removeAll()
-            console.log('todas reações removidas')
-
-
-        } catch (error) {
-            console.log(error)
-        }
-    }
-
-    async function removeReactions() {
-        const message = await channel.messages.fetch('727128017318707220');
-        try {
-            // Loop através de todas as reações na mensagem
-            for (const reaction of message.reactions.cache.values()) {
-                const emojiName = reaction.emoji.name.toLowerCase(); // Converte o nome da emoji para letras minúsculas
-
-                // Verifica se a emoji é diferente de 'thumbsup' e 'white_check_mark'
-                if (emojiName !== '✅' && emojiName !== '👍') {
-                    // Obtém a lista de usuários que reagiram com a emoji
-                    const users = await reaction.users.fetch();
-
-
-                    //Remove a reação de todos os usuários, exceto se for a própria bot
-                    users.forEach(async (user) => {
-                        if (user.id !== client.user.id) {
-                            await reaction.users.remove(user);
-                        }
-                    });
-                    // Registra a remoção da reação no console
-                    console.log(`Reação removida: ${emojiName}`);
-                }
-            }
-
-            // Registro de conclusão da remoção das reações no console
-            console.log('Todas as reações não desejadas foram removidas.');
-        } catch (error) {
-            console.error(`Ocorreu um erro ao remover as reações: ${error}`);
-        }
-
-        //message.edit({components:[rulesButton]})
-    }
-
-    async function addButton() {
-        const channelId = client.guilds.cache.first().rulesChannelId
-        const channel = client.channels.cache.get(rulesChannel)
-        let messageId = ''
-
-        const acceptMessageTemplate = `
-            Antes de perguntar algo, consulte os canais ${channelMention('538757439655378944')} ${channelMention('699291742536597534')} ${channelMention('540970007165665293')} ${channelMention('538757509037686794')}
-            Clique no botão abaixo para aceitar as`;
-
-        try {
-            //console.log(channelId)
-            let counter = 0
-            const messageList = await channel.messages.fetch().then(messages => {
-                //console.log(`Received ${messages.size} messages`);
-                //Iterate through the messages here with the variable "messages".
-                messages.forEach(message => {
-                    if (message.content.trim() == acceptMessageTemplate.trim()) {
-                        counter++
-                        messageId = message.id;
-                    }
-                })
-            })
-
-            if (counter == 0) {
-                const message = channel.send(acceptMessageTemplate);
-                messageId = message.id;
-            } else {
-                console.log(`A mensagem já existe ${channelId}`)
-            }
-
-
-            // Cria a ação de linha de mensagem com o botão do módulo
-
-
-            // Edita a mensagem existente ou a mensagem recém-criada para adicionar o componente
-            const message = await channel.messages.fetch(messageId); // Obtém a mensagem com a ID
-            message.edit({
-                components: [
-                    {
-                        "type": 1,
-                        "components": [
-                            {
-                                "style": 1,
-                                "label": `Eu li e aceito as regras`,
-                                "custom_id": `accept_yes`,
-                                "disabled": false,
-                                "emoji": {
-                                    "id": null,
-                                    "name": `✅`
-                                },
-                                "type": 2
-                            }
-
-                        ]
-                    }]
-            }); // Edita a mensagem para adicionar o componente                
-            console.log(`Mensagem criada/editada com ID: ${messageId}`);
-        } catch (error) {
-            console.error('Ocorreu um erro:', error);
-        }
-    }
-    reactions()
-    removeReactions()
-    addButton()
-
-	  cron.schedule('0 8 * * *', () => {
-		// Use uma API de gifs para obter uma gif de bom dia (neste exemplo, usamos a API do Giphy)
-		fetch('https://api.giphy.com/v1/gifs/random?tag=bom%20dia&api_key=BOcS2Rlvdy2JapFW7gy36Kc2vwyI5xRe')
-		  .then(res => res.json())
-		  .then(data => {
-		    // Verifique se a resposta da API é válida
-		    if (data && data.data && data.data.images && data.data.images.original && data.data.images.original.url) {
-		      const gifUrl = data.data.images.original.url;
-		      // Enviar a gif para o canal do Discord
-		      const channel = client.channels.cache.get(channelId);
-		      if (channel && channel.isText()) {
-		        channel.send(`Bom dia! Aqui está uma gif para você! ${gifUrl}`);
-		      }
-		    }
-		  })
-		  .catch(error => {
-		    console.error('Erro ao obter a gif de bom dia:', error);
-		  });
-	  });
+    startBot(client, regrasChannel, serverId, c, cron)
 });
-
-// Faça o login do bot com o token
-client.login(token);
 
 //Certifique-se de substituir SEU_TOKEN_DE_BOT_DO_DISCORD_AQUI pelo token do seu bot do Discord e ID_DO_CANAL_DO_DISCORD_AQUI pelo ID do canal onde você deseja que a gif de bom dia seja enviada. Além disso, você também precisará de uma chave de API do Giphy para obter as gifs de bom dia. Você pode obter uma chave de API gratuitamente registrando-se no site do Giphy (https://developers.giphy.com/).
 
 
 client.on('messageCreate', async message => {
-        
-    if (message.member == '1063528592648192011') {
-        const channel = await client.channels.fetch(message.channelId);
-        const messages = await channel.messages.fetch({ limit: 100 });
-        const botMessages = messages.filter(message => message.author.id === '1063528592648192011');
-        const messageCount = botMessages.size;
-        
-
-        if (messageCount > 1) {
-            const messagesToDelete = Array.from(botMessages.values()).slice(1, messageCount - 1);
-            channel.bulkDelete(messagesToDelete);
-        }
-        
-    }
-
-    const rulesTxt = `
-    Olá ${message.author.name}, Por favor, leia e aceite as regras na sala ${regrasChannel} antes de enviar mensagens nas salas. 
-    Se atente em mandar as mensagens nas salas corretas, o fórum também tem regras importantes
-    , é necessário que você leia as regras para ajudar a manter o server organizado.
-    Siga o canal nas redes sociais, outras plataformas e outros canais em https://linktr.ee/hardlevel
-    `
-    //if (message.member.user.id == botId) {
-        //console.log(message)
-        
-    //}
-
-
-    if ((message.member) && (message.member.user.bot == false)) {
-        const member = message.member;
-        const highestRole = member.roles.highest;
-        
-        const sala = client.channels.cache.get(message.channelId).name
-
-        //if (member && !member.data.has('noobCounter')) {
-        //    member.data.set('noobCounter', 0);
-        //} 
-
-        if (highestRole.name === 'noob') {
-            try {
-                if (!tentativas.hasOwnProperty(member.id)) {
-                    tentativas[member.id] = 1;
-                    console.log('primeiro if ' + tentativas[member.id])
-                } else {
-                    console.log('entrou no eslse')
-                    tentativas[member.id]++; 
-                    
-                    if (tentativas[member.id] > 3) {                 
-                    message.delete();
-                    member.send(`
-Por favor, leia e aceite as regras na sala ${regrasChannel} antes de enviar mensagens nas salas. \n
-Se atente em mandar as mensagens nas salas corretas, o fórum também tem regras importantes \n
-, é necessário que você leia as regras para ajudar a manter o server organizado. \n
-Você recebeu um mute por insistir em mandar mensagens sem ter lido e aceitado as regras! Evite tomar um ban! \n
-Siga o canal nas redes sociais, outras plataformas e outros canais em https://linktr.ee/hardlevel
-`);
-                    member.timeout(1000_000);
-                    tentativas[member.id] = 0; 
-                    console.log(member.author.name + ' mutado')
-                    return
-                    }                    
-                }
-                const reply = message.channel.send(`<@${member.user.id}>, vai com calma ai fera, você ainda é não leu e aceitou as regras do server, leia e aceite as ${regrasChannel} reagindo com :thumbsup: ou :white_check_mark: antes de mandar mensagens nas salas! Se insistir receberá um mute. Tentativas: ${tentativas[member.id]}`);
-                message.delete()
-                const msgId = (await reply).id
-
-                console.log('tentativas do noob ' + tentativas[member.id]) 
-            } catch (error) {
-                console.error(`Ocorreu um erro ao tentar apagar a mensagem: ${error}`);
-            }
-        }
-
-        console.log(`${message.author.tag} tem o cargo ${highestRole.name} sala ${client.channels.cache.get(message.channelId)} na sala ${sala}`);
-        if (message.channel.id != '786263907207348244') {
-            const content = message.content;
-            const urls = content.match(urlRegex()); // Encontrar URLs na mensagem usando a regex
-
-            if (urls) {
-                // Se a mensagem contiver URLs, chamar a função de tratamento
-                tratarUrls(urls, message);
-            }
-        }
-    }
+    handleMessage(client, message, regrasChannel, urlRegex);
 });
 
 client.on(Events.MessageReactionAdd, async (reaction, user) => {
@@ -438,3 +217,4 @@ async function proccessBotMessage(id, content, channelId, botId){
 }
 
 client.login(token);
+

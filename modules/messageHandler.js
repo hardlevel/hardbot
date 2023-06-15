@@ -1,5 +1,5 @@
 async function handleMessage(client, message, regrasChannel, urlRegex) {
-    if (message.member == '1063528592648192011') {
+    if (message.member == bodId) {
         const channel = await client.channels.fetch(message.channelId);
         const messages = await channel.messages.fetch({ limit: 100 });
         const botMessages = messages.filter(message => message.author.id === '1063528592648192011');

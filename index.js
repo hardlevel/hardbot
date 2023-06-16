@@ -8,6 +8,7 @@ const {
     ButtonBuilder,
     ButtonStyle,
     Message,
+    Thread,
     channelMention,
     MessageActionRow,
     MessageButton,

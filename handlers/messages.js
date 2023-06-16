@@ -19,7 +19,7 @@ module.exports = (client) => {
             console.log("URL do AliExpress:", url);
             console.log("ID do item:", id);
 
-            const apiUrl = `http://localhost:8000/api/ali/${id}`
+            const apiUrl = `http://localhost:5000/api/ali/${id}`
             
             axios.get(apiUrl)
                 .then(response => {

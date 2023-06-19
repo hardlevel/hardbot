@@ -1,5 +1,5 @@
 const { client } = require('../index')
-const alertForum = "Seu post em nosso forum não pode ser aprovado pois o título possui palavras não permitidas, por favor leia as regras com atenção antes de enviar mensagens no server. \n Mensagens com titulos extremamente vagos que não detalham o problema não serão aprovados!"
+const alertForum = "Seu post em nosso forum não pode ser aprovado pois o título possui palavras não permitidas ou é curto demais, por favor leia as regras com atenção antes de enviar mensagens no server. \n Mensagens com titulos extremamente vagos que não detalham o problema não serão aprovados!"
 const filter = ['ajuda','ajude','me ajuda','socorro','urgente']
 const { MessageManager } = require('discord.js')
 const axios = require('axios');
@@ -45,6 +45,11 @@ module.exports = (client) => {
         let channelId = thread.parentId
         if (thread.parent.type === 15){
             if (filter.some(substring=>thread.name.includes(substring))){
+                client.users.send(postMember, alertForum);
+                thread.delete()
+            }
+            var palavras = thread.name.split(" ");
+            if (palavras.length <= 2) {
                 client.users.send(postMember, alertForum);
                 thread.delete()
             }

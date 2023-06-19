@@ -10,16 +10,30 @@ module.exports = (client) => {
         const author = message.author
         const content = message.content
 
-        const regex = /https?:\/\/.*?aliexpress\.com\/item\/(\d+)\.html/i;
+        //const regex = /https?:\/\/.*?aliexpress\.com\/item\/(\d+)\.html/i;
+        const regex = /https?:\/\/(?:.*?aliexpress\.com\/item\/(\d+)\.html|s\.click\.aliexpress\.com\/(?:e|item)\/(\w+))/i;
         const match = content.match(regex);
     
         if (match) {
             const url = match[0];
-            const id = match[1];
-            console.log("URL do AliExpress:", url);
-            console.log("ID do item:", id);
 
-            const apiUrl = `http://localhost:5000/api/ali/${id}`
+            let id;
+
+            let tipo;
+
+            if (match[1]) {
+                id = match[1];
+                tipo = 1; // URL padrão do AliExpress
+            } else if (match[2]) {
+                id = match[2];
+                tipo = 2; // URL encurtada
+            }
+
+            console.log("URL do AliExpress: ", url);
+            console.log("ID do item: ", id);
+            console.log("Tipo de url: ", tipo )
+
+            const apiUrl = `http://localhost:5000/api/ali/${id}/${tipo}`
             
             axios.get(apiUrl)
                 .then(response => {

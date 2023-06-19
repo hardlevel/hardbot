@@ -28,7 +28,7 @@ module.exports = (client) => {
                     const promotionLink = response.data.link[0].promotion_link;
                     console.log("Valor de promotion_link:", promotionLink);
                     message.reply('Use este link para comprar o produto no Aliexpress: ' + promotionLink);
-                    //message.delete()
+                    message.delete()
                     
                 })
                 .catch(error => {

@@ -10,7 +10,7 @@ module.exports = (client) => {
         const author = message.author
         const content = message.content
 
-        const regex = /https?:\/\/\w+\.aliexpress\.com\/item\/(\d+)\.html/i;
+        const regex = /https?:\/\/.*?aliexpress\.com\/item\/(\d+)\.html/i;
         const match = content.match(regex);
     
         if (match) {

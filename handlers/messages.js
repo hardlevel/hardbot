@@ -3,6 +3,8 @@ const alertForum = "Seu post em nosso forum não pode ser aprovado pois o títul
 const filter = ['ajuda','ajude','me ajuda','socorro','urgente']
 const { MessageManager } = require('discord.js')
 const axios = require('axios');
+require('dotenv-safe').config();
+const { Telegraf } = require('telegraf')
 
 module.exports = (client) => {
     client.on('messageCreate', async message => {
@@ -48,6 +50,8 @@ module.exports = (client) => {
                         message.reply('Use este link para comprar o produto no Aliexpress: ' + promotionLink)
                             .then(msg => setTimeout(() => message.delete(), 3000))
                         //message.delete()
+                        const tg = new Telegraf(process.env.TELEGRAM_TOKEN);
+                        tg.telegram.sendMessage(process.env.TELEGRAM_CHAT, 'A galera do discord compartilhou essa oferta! Talvez você também ache interessante! ' + promotionLink);
                     })
                     .catch(error => {
                         console.error("Erro na solicitação da API:", error)

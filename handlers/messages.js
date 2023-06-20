@@ -9,46 +9,46 @@ module.exports = (client) => {
         //console.log(message)
         const author = message.author
         const content = message.content
+        if (!author == '1063528592648192011'){
+            //const regex = /https?:\/\/.*?aliexpress\.com\/item\/(\d+)\.html/i;
+            const regex = /https?:\/\/(?:.*?aliexpress\.com\/item\/(\d+)\.html|s\.click\.aliexpress\.com\/(?:e|item)\/(\w+))/i;
+            const match = content.match(regex);
+        
+            if (match) {
+                const url = match[0];
 
-        //const regex = /https?:\/\/.*?aliexpress\.com\/item\/(\d+)\.html/i;
-        const regex = /https?:\/\/(?:.*?aliexpress\.com\/item\/(\d+)\.html|s\.click\.aliexpress\.com\/(?:e|item)\/(\w+))/i;
-        const match = content.match(regex);
-    
-        if (match) {
-            const url = match[0];
+                let id;
 
-            let id;
+                let tipo;
 
-            let tipo;
+                if (match[1]) {
+                    id = match[1];
+                    tipo = 1; // URL padrão do AliExpress
+                } else if (match[2]) {
+                    id = match[2];
+                    tipo = 2; // URL encurtada
+                }
 
-            if (match[1]) {
-                id = match[1];
-                tipo = 1; // URL padrão do AliExpress
-            } else if (match[2]) {
-                id = match[2];
-                tipo = 2; // URL encurtada
+                console.log("URL do AliExpress: ", url);
+                console.log("ID do item: ", id);
+                console.log("Tipo de url: ", tipo )
+
+                const apiUrl = `http://aliapi/api/ali/${id}/${tipo}`
+                
+                axios.get(apiUrl)
+                    .then(response => {
+                        //console.log(message)
+                        //console.log("Resposta da API:", response.data);
+                        const promotionLink = response.data.link[0].promotion_link;
+                        console.log("Valor de promotion_link:", promotionLink);
+                        message.reply('Use este link para comprar o produto no Aliexpress: ' + promotionLink);
+                        message.delete()
+                    })
+                    .catch(error => {
+                        console.error("Erro na solicitação da API:", error)
+                        // Trate o erro conforme necessário
+                    });           
             }
-
-            console.log("URL do AliExpress: ", url);
-            console.log("ID do item: ", id);
-            console.log("Tipo de url: ", tipo )
-
-            const apiUrl = `http://aliapi/api/ali/${id}/${tipo}`
-            
-            axios.get(apiUrl)
-                .then(response => {
-                    //console.log(message)
-                    //console.log("Resposta da API:", response.data);
-                    const promotionLink = response.data.link[0].promotion_link;
-                    console.log("Valor de promotion_link:", promotionLink);
-                    message.reply('Use este link para comprar o produto no Aliexpress: ' + promotionLink);
-                    message.delete()
-                    
-                })
-                .catch(error => {
-                    console.error("Erro na solicitação da API:", error)
-                    // Trate o erro conforme necessário
-                });           
         }
     });
 

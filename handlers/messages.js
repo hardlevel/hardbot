@@ -3,11 +3,10 @@ const alertForum = "Seu post em nosso forum não pode ser aprovado pois o títul
 const filter = ['ajuda','ajude','me ajuda','socorro','urgente']
 const { MessageManager } = require('discord.js')
 const axios = require('axios');
-require('dotenv-safe').config();
 const { Telegraf } = require('telegraf')
 
 module.exports = (client) => {
-    client.on('messageCreate', async message => {
+    client.on('messageCreate', async message => {        
         //console.log(message)
         const author = message.author
         const content = message.content

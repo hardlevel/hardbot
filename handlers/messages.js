@@ -45,14 +45,15 @@ module.exports = (client) => {
                         //console.log(message)
                         //console.log("Resposta da API:", response.data);
                         const promotionLink = response.data.link[0].promotion_link;
-                        const title = response.data.title[0]
-                        const image = response.data.image[0]
+                        //const title = response.data.title[0]
+                        //const image = response.data.image[0]
+                        console.log(response.data)
                         console.log("Valor de promotion_link:", promotionLink);
                         message.reply('Use este link para comprar o produto no Aliexpress: ' + title + promotionLink)
                             .then(msg => setTimeout(() => message.delete(), 3000))
                         //message.delete()
                         const tg = new Telegraf(process.env.TELEGRAM_TOKEN);
-                        tg.telegram.sendMessage(process.env.TELEGRAM_CHAT, 'A galera do discord compartilhou essa oferta! Talvez você também ache interessante! ' + promotionLink);
+                        //tg.telegram.sendMessage(process.env.TELEGRAM_CHAT, 'A galera do discord compartilhou essa oferta! Talvez você também ache interessante! ' + promotionLink);
                     })
                     .catch(error => {
                         console.error("Erro na solicitação da API:", error)

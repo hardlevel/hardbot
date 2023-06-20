@@ -13,10 +13,12 @@ module.exports = (client) => {
         if (author != '1063528592648192011'){
             console.log('mensagem não é do bot')
             //const regex = /https?:\/\/.*?aliexpress\.com\/item\/(\d+)\.html/i;
-            const regex = /https?:\/\/(?:.*?aliexpress\.com\/item\/(\d+)\.html|s\.click\.aliexpress\.com\/(?:e|item)\/(\w+))/i;
+            const regex = /https?:\/\/(?:.*?\.?aliexpress\.com\/(?:[^\/]+\/)?(?:[^\/]+\/)?(?:item\/)?([\w-]+)(?:\.html)?|(?:[^\/]+\.)?(?:[a-z]+\.)?aliexpress\.com\/(?:e|item)\/([\w-]+))/i;
+
             const match = content.match(regex);
         
             if (match) {
+                console.log('Padrão de url identificado')
                 const url = match[0];
 
                 let id;
@@ -43,8 +45,9 @@ module.exports = (client) => {
                         //console.log("Resposta da API:", response.data);
                         const promotionLink = response.data.link[0].promotion_link;
                         console.log("Valor de promotion_link:", promotionLink);
+                        message.editMessage('Pinto')
                         message.reply('Use este link para comprar o produto no Aliexpress: ' + promotionLink)
-                            .then(msg => setTimeout(() => msg.delete(), 3000))
+                            //.then(msg => setTimeout(() => msg.delete(), 3000))
                         //message.delete()
                     })
                     .catch(error => {

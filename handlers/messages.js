@@ -45,9 +45,8 @@ module.exports = (client) => {
                         //console.log("Resposta da API:", response.data);
                         const promotionLink = response.data.link[0].promotion_link;
                         console.log("Valor de promotion_link:", promotionLink);
-                        message.editMessage('Pinto')
                         message.reply('Use este link para comprar o produto no Aliexpress: ' + promotionLink)
-                            //.then(msg => setTimeout(() => msg.delete(), 3000))
+                            .then(msg => setTimeout(() => message.delete(), 3000))
                         //message.delete()
                     })
                     .catch(error => {

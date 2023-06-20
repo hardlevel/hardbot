@@ -9,7 +9,9 @@ module.exports = (client) => {
         //console.log(message)
         const author = message.author
         const content = message.content
-        if (!author == '1063528592648192011'){
+        console.log(author + ' - ' + content)
+        if (author != '1063528592648192011'){
+            console.log('mensagem não é do bot')
             //const regex = /https?:\/\/.*?aliexpress\.com\/item\/(\d+)\.html/i;
             const regex = /https?:\/\/(?:.*?aliexpress\.com\/item\/(\d+)\.html|s\.click\.aliexpress\.com\/(?:e|item)\/(\w+))/i;
             const match = content.match(regex);

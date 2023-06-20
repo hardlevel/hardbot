@@ -49,7 +49,7 @@ module.exports = (client) => {
                         //const image = response.data.image[0]
                         console.log(response.data)
                         console.log("Valor de promotion_link:", promotionLink);
-                        message.reply('Use este link para comprar o produto no Aliexpress: ' + title + promotionLink)
+                        message.reply('Use este link para comprar o produto no Aliexpress: ' + promotionLink)
                             .then(msg => setTimeout(() => message.delete(), 3000))
                         //message.delete()
                         const tg = new Telegraf(process.env.TELEGRAM_TOKEN);

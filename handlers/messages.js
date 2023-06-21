@@ -20,8 +20,9 @@ module.exports = (client) => {
             const match = content.match(regex);
         
             if (match) {
-                const url = encodeURIComponent(match[0]);
-                console.log('Padrão de url identificado ' + url)
+                //console.log(match.input)
+                const url = encodeURIComponent(match.input);
+                //console.log('Padrão de url identificado ' + url)
 
                 // let id;
 
@@ -42,6 +43,7 @@ module.exports = (client) => {
                 //const apiUrl = `http://aliapi/api/ali/${id}/${tipo}`
                 const apiUrl = `http://aliapi/api/ali/${url}`
                 
+                //console.log(apiUrl)
                 axios.get(apiUrl)
                     .then(response => {
                         //console.log(message)

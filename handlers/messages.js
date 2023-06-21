@@ -40,7 +40,7 @@ module.exports = (client) => {
                 //console.log("Tipo de url: ", tipo )
 
                 //const apiUrl = `http://aliapi/api/ali/${id}/${tipo}`
-                const apiUrl = `http://aliapi/api/ali/${id}/${tipo}`
+                const apiUrl = `http://aliapi/api/ali/${url}`
                 
                 axios.get(apiUrl)
                     .then(response => {

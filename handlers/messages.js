@@ -14,30 +14,32 @@ module.exports = (client) => {
         if (author != '1063528592648192011'){
             console.log('mensagem não é do bot')
             //const regex = /https?:\/\/.*?aliexpress\.com\/item\/(\d+)\.html/i;
-            const regex = /https?:\/\/(?:.*?\.?aliexpress\.com\/(?:[^\/]+\/)?(?:[^\/]+\/)?(?:item\/)?([\w-]+)(?:\.html)?|(?:[^\/]+\.)?(?:[a-z]+\.)?aliexpress\.com\/(?:e|item)\/([\w-]+))/i;
+            //const regex = /https?:\/\/(?:.*?\.?aliexpress\.com\/(?:[^\/]+\/)?(?:[^\/]+\/)?(?:item\/)?([\w-]+)(?:\.html)?|(?:[^\/]+\.)?(?:[a-z]+\.)?aliexpress\.com\/(?:e|item)\/([\w-]+))/i;
+            const regex = /((http|ftp|https):\/\/)?(([\w.-]*)\.([\w]*))/i
 
             const match = content.match(regex);
         
             if (match) {
-                console.log('Padrão de url identificado')
-                const url = match[0];
+                const url = encodeURIComponent(match[0]);
+                console.log('Padrão de url identificado ' + url)
 
-                let id;
+                // let id;
 
-                let tipo;
+                // let tipo;
 
-                if (match[1]) {
-                    id = match[1];
-                    tipo = 1; // URL padrão do AliExpress
-                } else if (match[2]) {
-                    id = match[2];
-                    tipo = 2; // URL encurtada
-                }
+                // if (match[1]) {
+                //     id = match[1];
+                //     tipo = 1; // URL padrão do AliExpress
+                // } else if (match[2]) {
+                //     id = match[2];
+                //     tipo = 2; // URL encurtada
+                // }
 
                 console.log("URL do AliExpress: ", url);
-                console.log("ID do item: ", id);
-                console.log("Tipo de url: ", tipo )
+                //console.log("ID do item: ", id);
+                //console.log("Tipo de url: ", tipo )
 
+                //const apiUrl = `http://aliapi/api/ali/${id}/${tipo}`
                 const apiUrl = `http://aliapi/api/ali/${id}/${tipo}`
                 
                 axios.get(apiUrl)

@@ -306,7 +306,7 @@ async function sendToTelegram(data){
     console.log('Url recebida para enviar para o telegram: ' + data.link)
     const chat_id = process.env.TELEGRAM_CHAT
     const caption = `Confira esse produto que foi compartilhado no Discord! Talvez seja do seu interesse! ${data.title} ${data.link}`
-    const photo = data.image.toString() + '?random=64'
+    const photo = data.image
     //tg.telegram.sendMessage(chatId, text)
     axios.post(`${url}${apiToken}/sendPhoto`,
     {

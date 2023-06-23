@@ -27,12 +27,12 @@ module.exports = (client) => {
                 const url = match.input;
                 try {
                     const productId = await getProductId(url)
-                    //const shortUrl = await getShotUrl(productId)
+                    const shortUrl = await getShotUrl(productId)
                     const metaData = await getOpenGraphData(productId)               
                     console.log('ID do produto: ' + productId);
-                    //console.log('URL Reduzida: ' + shortUrl);
+                    console.log('URL Reduzida: ' + shortUrl);
                     console.log('Meta: ' + metaData.ogTitle)
-                    //await replyMsg(message, productId, shortUrl, metaData)                    
+                    await replyMsg(message, productId, shortUrl, metaData)                    
                 } catch (err) {
                     console.log(err)
                 }  
@@ -61,8 +61,16 @@ module.exports = (client) => {
 
 async function getProductId(url) {
     console.log('URL recebida para obter ID: ' + url)
+    let finalUrl = ''
+    if (url.includes('/item/')){
+        const newUrl = new URL(url)
+        finalUrl = newUrl.origin + newUrl.pathname
+        console.log(finalUrl)
+    } else {
+        finalUrl = url
+    }
     try{
-        const response = await axios.get(url)
+        const response = await axios.get(finalUrl)
         const productUrl = new URL(response.request.res.responseUrl)
         // if (productUrl.includes('https://aliexpress.ru')){u
         //     productUrl = productUrl.replace('https://aliexpress.ru', 'https://pt.aliexpress.com')
@@ -100,60 +108,47 @@ async function getShotUrl(id) {
 }
 
 async function getOpenGraphData(id) {
-    try {
-        const url = `https://pt.aliexpress.com/item/${id}.html`
-        const response = await axios.get(url);
-        const html = response.data;
-        console.log(response.html)
 
-        // Use o Cheerio para carregar o HTML
-        const $ = cheerio.load(html);
+    const url = `https://pt.aliexpress.com/item/${id}.html`
+    // axios.get(url, {maxRedirects: 0})
+    // .then(res => {
+    //     console.log(typeof res.data)
+    //     const $ = cheerio.load(res.data.toString())
+    //     console.log($)
+    //     $('meta[property^="og:"]').each((index, element) => {
+    //         console.log(element)
+    //     });
 
-        // Obtenha as metatags do OpenGraph
-        const metaTags = $('meta[property^="og:"]');
 
-        // Crie um objeto para armazenar os dados do OpenGraph
-        const ogData = {};
+    // }).catch(err => console.error(err))
 
-        // Itere sobre as metatags e extraia os dados
-        metaTags.each((index, element) => {
-        const property = $(element).attr('property');
-        const content = $(element).attr('content');
-        ogData[property] = content;
-        });
 
-        return ogData;
-    } catch (error) {
-        console.error('Erro ao obter os dados do OpenGraph:', error);
-        throw error;
+    const ogs = require('open-graph-scraper');
+    const options = { url: `https://pt.aliexpress.com/item/${id}.html`, redirect: "error" };
+
+    let result;
+    let attempts = 0;
+
+    while (attempts < 100 && (!result || !result.ogTitle)) {
+        try {
+            const { error, html, result: ogResult, response } = await ogs(options);
+
+            //console.log('error:', error);
+            //console.log('result:', ogResult);
+
+            result = ogResult;
+            attempts++;
+        } catch (error) {
+            console.error('Error:', error);
+            return null;
+        }
     }
 
-    // const ogs = require('open-graph-scraper');
-    // const options = { url: `https://pt.aliexpress.com/item/${id}.html` };
-
-    // let result;
-    // let attempts = 0;
-
-    // while (attempts < 100 && (!result || !result.ogTitle)) {
-    //     try {
-    //         const { error, html, result: ogResult, response } = await ogs(options);
-
-    //         //console.log('error:', error);
-    //         //console.log('result:', ogResult);
-
-    //         result = ogResult;
-    //         attempts++;
-    //     } catch (error) {
-    //         console.error('Error:', error);
-    //         return null;
-    //     }
-    // }
-
-    // if (result && result.ogTitle) {
-    //     return result;
-    // } else {
-    //     return null;
-    // }
+    if (result && result.ogTitle) {
+        return result;
+    } else {
+        return null;
+    }
 }
 
 async function replyMsg(message, productId, shortUrl, metaData){

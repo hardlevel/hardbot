@@ -4,6 +4,7 @@ const filter = ['ajuda','ajude','me ajuda','socorro','urgente']
 const { MessageManager, EmbedBuilder } = require('discord.js')
 const axios = require('axios');
 const { urlencoded } = require('express');
+const { cheerio } = require('cheerio')
 
 module.exports = (client) => {
     client.on('messageCreate', async message => {        
@@ -26,13 +27,12 @@ module.exports = (client) => {
                 const url = match.input;
                 try {
                     const productId = await getProductId(url)
-                    const shortUrl = await getShotUrl(productId)
+                    //const shortUrl = await getShotUrl(productId)
                     const metaData = await getOpenGraphData(productId)               
                     console.log('ID do produto: ' + productId);
-                    console.log('URL Reduzida: ' + shortUrl);
+                    //console.log('URL Reduzida: ' + shortUrl);
                     console.log('Meta: ' + metaData.ogTitle)
-                    await replyMsg(message, productId, shortUrl, metaData)
-                    //await sendToTelegram(shortUrl, metaData)
+                    //await replyMsg(message, productId, shortUrl, metaData)                    
                 } catch (err) {
                     console.log(err)
                 }  
@@ -59,12 +59,17 @@ module.exports = (client) => {
     })
 }
 
-async function getProductId(shortURL) {
-    console.log('URL recebida: ' + shortURL)
+async function getProductId(url) {
+    console.log('URL recebida para obter ID: ' + url)
     try{
-        const response = await axios.get(shortURL)
+        const response = await axios.get(url)
         const productUrl = new URL(response.request.res.responseUrl)
+        // if (productUrl.includes('https://aliexpress.ru')){u
+        //     productUrl = productUrl.replace('https://aliexpress.ru', 'https://pt.aliexpress.com')
+        // }
         const productPath = productUrl.pathname
+        console.log(productPath)
+        console.log(productUrl)
         const regex = /\/item\/(\d+)\.html/
         const match = productPath.match(regex);
         const productId = match[1]
@@ -95,32 +100,60 @@ async function getShotUrl(id) {
 }
 
 async function getOpenGraphData(id) {
-    const ogs = require('open-graph-scraper');
-    const options = { url: `https://pt.aliexpress.com/item/${id}.html` };
+    try {
+        const url = `https://pt.aliexpress.com/item/${id}.html`
+        const response = await axios.get(url);
+        const html = response.data;
+        console.log(response.html)
 
-    let result;
-    let attempts = 0;
+        // Use o Cheerio para carregar o HTML
+        const $ = cheerio.load(html);
 
-    while (attempts < 5 && (!result || !result.ogTitle)) {
-        try {
-            const { error, html, result: ogResult, response } = await ogs(options);
+        // Obtenha as metatags do OpenGraph
+        const metaTags = $('meta[property^="og:"]');
 
-            //console.log('error:', error);
-            //console.log('result:', ogResult);
+        // Crie um objeto para armazenar os dados do OpenGraph
+        const ogData = {};
 
-            result = ogResult;
-            attempts++;
-        } catch (error) {
-            console.error('Error:', error);
-            return null;
-        }
+        // Itere sobre as metatags e extraia os dados
+        metaTags.each((index, element) => {
+        const property = $(element).attr('property');
+        const content = $(element).attr('content');
+        ogData[property] = content;
+        });
+
+        return ogData;
+    } catch (error) {
+        console.error('Erro ao obter os dados do OpenGraph:', error);
+        throw error;
     }
 
-    if (result && result.ogTitle) {
-        return result;
-    } else {
-        return null;
-    }
+    // const ogs = require('open-graph-scraper');
+    // const options = { url: `https://pt.aliexpress.com/item/${id}.html` };
+
+    // let result;
+    // let attempts = 0;
+
+    // while (attempts < 100 && (!result || !result.ogTitle)) {
+    //     try {
+    //         const { error, html, result: ogResult, response } = await ogs(options);
+
+    //         //console.log('error:', error);
+    //         //console.log('result:', ogResult);
+
+    //         result = ogResult;
+    //         attempts++;
+    //     } catch (error) {
+    //         console.error('Error:', error);
+    //         return null;
+    //     }
+    // }
+
+    // if (result && result.ogTitle) {
+    //     return result;
+    // } else {
+    //     return null;
+    // }
 }
 
 async function replyMsg(message, productId, shortUrl, metaData){

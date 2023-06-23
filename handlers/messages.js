@@ -64,27 +64,31 @@ async function getProductId(url) {
     let finalUrl = ''
     if (url.includes('/item/')){
         const newUrl = new URL(url)
-        finalUrl = newUrl.origin + newUrl.pathname
-        console.log(finalUrl)
-    } else {
-        finalUrl = url
-    }
-    try{
-        const response = await axios.get(finalUrl)
-        const productUrl = new URL(response.request.res.responseUrl)
-        // if (productUrl.includes('https://aliexpress.ru')){u
-        //     productUrl = productUrl.replace('https://aliexpress.ru', 'https://pt.aliexpress.com')
-        // }
-        const productPath = productUrl.pathname
-        console.log(productPath)
-        console.log(productUrl)
+        const productPath = newUrl.pathname
         const regex = /\/item\/(\d+)\.html/
         const match = productPath.match(regex);
         const productId = match[1]
         console.log('ID do produto: ' + productId)
         return productId
-    } catch(err) {
-        console.log(err)
+    } else {
+        finalUrl = url
+        try{
+            const response = await axios.get(finalUrl)
+            const productUrl = new URL(response.request.res.responseUrl)
+            // if (productUrl.includes('https://aliexpress.ru')){u
+            //     productUrl = productUrl.replace('https://aliexpress.ru', 'https://pt.aliexpress.com')
+            // }
+            const productPath = productUrl.pathname
+            console.log(productPath)
+            console.log(productUrl)
+            const regex = /\/item\/(\d+)\.html/
+            const match = productPath.match(regex);
+            const productId = match[1]
+            console.log('ID do produto: ' + productId)
+            return productId
+        } catch(err) {
+            console.log(err)
+        }
     }
 }
 

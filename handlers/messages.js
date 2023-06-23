@@ -30,10 +30,10 @@ module.exports = (client) => {
                 try {
                     const productId = await getProductId(url)
                     const shortUrl = await getShotUrl(productId)
-                    const metaData = await getOpenGraphData(productId)               
+                    const metaData = await getProductInfo(productId)               
                     console.log('ID do produto: ' + productId);
                     console.log('URL Reduzida: ' + shortUrl);
-                    console.log('Meta: ' + metaData.ogTitle)
+                    console.log('Meta: ' + metaData.image)
                     await replyMsg(message, productId, shortUrl, metaData)                    
                 } catch (err) {
                     console.log(err)
@@ -225,71 +225,78 @@ async function getShotUrl(id) {
 //         return ogData;
 // }
 
-async function getOpenGraphData(id) {
-    const url = `https://pt.aliexpress.com/item/${id}.html`;
-    const maxAttempts = 50;
-    const delay = 1000; // Delay entre as tentativas (em milissegundos)
-    let ogData = null;
-    let attempt = 1;
+// async function getOpenGraphData(id) {
+//     const url = `https://pt.aliexpress.com/item/${id}.html`;
+//     const maxAttempts = 50;
+//     const delay = 1000; // Delay entre as tentativas (em milissegundos)
+//     let ogData = null;
+//     let attempt = 1;
 
-    while (attempt <= maxAttempts && (ogData === null || ogData === undefined || hasUndefinedValues(ogData))) {
-        console.log('Tentativa: ' + attempt);
+//     while (attempt <= maxAttempts && (ogData === null || ogData === undefined || hasUndefinedValues(ogData))) {
+//         console.log('Tentativa: ' + attempt);
 
-        try {
-            const response = await axios.get(url, { maxRedirects: 0 });
+//         try {
+//             const response = await axios.get(url, { maxRedirects: 0 });
 
-            if (response.status !== 200) {
-                throw new Error('Erro ao obter o conteúdo da URL.');
-            }
+//             if (response.status !== 200) {
+//                 throw new Error('Erro ao obter o conteúdo da URL.');
+//             }
 
-            const html = response.data;
+//             const html = response.data;
 
-            const $ = cheerio.load(html);
+//             const $ = cheerio.load(html);
 
-            ogData = {
-                ogTitle: $('meta[property="og:title"]').attr('content'),
-                ogDescription: $('meta[property="og:description"]').attr('content'),
-                ogImage: $('meta[property="og:image"]').attr('content'),
-                // Adicione outras tags OpenGraph que você precisa extrair
-            };
-        } catch (error) {
-            console.error('Erro ao obter os dados do OpenGraph:', error.message);
-        }
+//             ogData = {
+//                 ogTitle: $('meta[property="og:title"]').attr('content'),
+//                 ogDescription: $('meta[property="og:description"]').attr('content'),
+//                 ogImage: $('meta[property="og:image"]').attr('content'),
+//                 // Adicione outras tags OpenGraph que você precisa extrair
+//             };
+//         } catch (error) {
+//             console.error('Erro ao obter os dados do OpenGraph:', error.message);
+//         }
 
-        attempt++;
+//         attempt++;
 
-        if (!ogData && attempt <= maxAttempts) {
-            await new Promise((resolve) => setTimeout(resolve, delay));
-        }
-    }
+//         if (!ogData && attempt <= maxAttempts) {
+//             await new Promise((resolve) => setTimeout(resolve, delay));
+//         }
+//     }
 
-    console.log(ogData);
-    return ogData;
+//     console.log(ogData);
+//     return ogData;
+// }
+
+async function getProductInfo(id){
+    const apiUrl = 'http://aliapi/api/product/' + id;
+    //const apiUrl = 'http://127.0.0.1:8000/api/product/' + id;
+    return new Promise((resolve, reject) => {
+        axios.get(apiUrl)
+        .then(function(response) {
+            console.log("Resultado API: " + response.data);
+            //console.log(response.status);
+            //console.log(response.statusText);
+            resolve(response.data);
+        })
+        .catch(function(error) {
+            //console.error(error);
+            reject(error);
+        });
+    });
 }
-
-function hasUndefinedValues(obj) {
-    for (let key in obj) {
-        if (obj[key] === undefined) {
-            return true;
-        }
-    }
-    return false;
-}
-
-
 
 async function replyMsg(message, productId, shortUrl, metaData){
     //console.log(metaData)
     const productMessage = new EmbedBuilder()
         .setColor(0x0099FF)
-        .setTitle(metaData.ogTitle.split('|')[1].trim())
+        .setTitle(metaData.title)
         .setURL(shortUrl)
-        .setAuthor({ name: 'Venão', iconURL: 'https:' + metaData.favicon, url: shortUrl })
-        .setDescription(metaData.ogTitle)
-        .setThumbnail(metaData.ogImage[0].url)
-        .setImage(metaData.ogImage[0].url)
+        .setAuthor({ name: 'Venão', iconURL: metaData.image, url: shortUrl })
+        .setDescription(metaData.title)
+        .setThumbnail(metaData.image)
+        .setImage(metaData.image)
         .setTimestamp()
-        .setFooter({ text: 'Aproveite esta oferta incrível!', iconURL: metaData.ogImage[0].url });    
+        .setFooter({ text: 'Aproveite esta oferta incrível!', iconURL: metaData.image });    
     message.reply({embeds: [productMessage]})
         .then(msg => setTimeout(() => message.delete(), 3000))
         .then(sendToTelegram(shortUrl, metaData))

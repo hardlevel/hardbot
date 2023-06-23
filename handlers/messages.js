@@ -298,7 +298,7 @@ async function replyMsg(message, productId, shortUrl, metaData){
         .setFooter({ text: 'Aproveite esta oferta incrível!', iconURL: data.image });    
     message.reply({embeds: [productMessage]})
         .then(msg => setTimeout(() => message.delete(), 3000))
-        //.then(sendToTelegram(data))
+        .then(sendToTelegram(data))
 }
 
 async function sendToTelegram(data){

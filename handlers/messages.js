@@ -284,6 +284,7 @@ async function getShotUrl(id) {
 
 async function replyMsg(message, productId, shortUrl, metaData){
     const data = await getShotUrl(productId);
+    console.log('URL Reduzida: ' + data.link)
     //console.log(metaData)
     const productMessage = new EmbedBuilder()
         .setColor(0x0099FF)

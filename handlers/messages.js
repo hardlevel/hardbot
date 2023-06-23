@@ -7,6 +7,7 @@ const { urlencoded } = require('express');
 const fetch = require('node-fetch');
 const cheerio = require('cheerio');
 
+
 module.exports = (client) => {
     client.on('messageCreate', async message => {        
         //console.log(message)
@@ -142,23 +143,107 @@ async function getShotUrl(id) {
 //     }
 // }
 
+// async function getOpenGraphData(id) {
+//     const url = `https://pt.aliexpress.com/item/${id}.html`
+//     let ogData = null;
+
+//     while (!ogData) {
+//         console.log('Tentando resgatar informações...')
+//         try {
+//             console.log('começando...')
+//             // const response = await fetch(url, { redirect: 'manual' });
+
+//             // if (!response.ok) {
+//             //     throw new Error('Erro ao obter o conteúdo da URL.');
+//             // }
+//             const response = await axios.get(url, { follow: false });
+
+//             if (!response.status === 200) {
+//                 throw new Error('Erro ao obter o conteúdo da URL.');
+//             }
+
+//             //const html = await response.text();
+//             const html = await response.data;
+            
+//             // Use o cheerio para carregar o HTML
+//             const $ = cheerio.load(html);
+//             //console.log($)
+//             ogData = {
+//                 ogTitle: $('meta[property="og:title"]').attr('content'),
+//                 ogDescription: $('meta[property="og:description"]').attr('content'),
+//                 ogImage: $('meta[property="og:image"]').attr('content'),
+//                 // Adicione outras tags OpenGraph que você precisa extrair
+//             };
+//         } catch (error) {
+//             console.error('Erro ao obter os dados do OpenGraph:', error.message);
+//         }
+//     }
+//     console.log(ogData)
+//     return ogData;
+// }
+
+// async function getOpenGraphData(id) {
+//     const url = `https://pt.aliexpress.com/item/${id}.html`;
+//     const maxAttempts = 5;
+//     const delay = 1000; // tempo de espera em milissegundos
+//     let ogData = null;
+//     let attempt = 1;
+
+//     while (attempt <= maxAttempts && ogData === null) {
+//         console.log('Tentativa: ' + attempt);
+
+//         try {
+//             const response = await axios.get(url, { maxRedirects: 0 });
+    
+//             if (response.status !== 200) {
+//             throw new Error('Erro ao obter o conteúdo da URL.');
+//             }
+    
+//             const html = response.data;
+    
+//             // Use o cheerio para carregar o HTML
+//             const $ = cheerio.load(html);
+    
+//             ogData = {
+//             ogTitle: $('meta[property="og:title"]').attr('content'),
+//             ogDescription: $('meta[property="og:description"]').attr('content'),
+//             ogImage: $('meta[property="og:image"]').attr('content'),
+//             // Adicione outras tags OpenGraph que você precisa extrair
+//             };
+//         } catch (error) {
+//             console.error('Erro ao obter os dados do OpenGraph:', error.message);
+//         }
+    
+//         attempt++;
+    
+//         if (ogData === null && attempt <= maxAttempts) {
+//             await new Promise((resolve) => setTimeout(resolve, delay));
+//         }
+//         }
+    
+//         console.log(ogData);
+//         return ogData;
+// }
+
 async function getOpenGraphData(id) {
-    const url = `https://pt.aliexpress.com/item/${id}.html`
+    const url = `https://pt.aliexpress.com/item/${id}.html`;
+    const maxAttempts = 50;
+    const delay = 1000; // Delay entre as tentativas (em milissegundos)
     let ogData = null;
+    let attempt = 1;
 
-    while (!ogData) {
-        console.log('Tentando resgatar informações...')
+    while (attempt <= maxAttempts && (ogData === null || ogData === undefined || hasUndefinedValues(ogData))) {
+        console.log('Tentativa: ' + attempt);
+
         try {
-            console.log('começando...')
-            const response = await fetch(url, { redirect: 'manual' });
+            const response = await axios.get(url, { maxRedirects: 0 });
 
-            if (!response.ok) {
+            if (response.status !== 200) {
                 throw new Error('Erro ao obter o conteúdo da URL.');
             }
 
-            const html = await response.text();
+            const html = response.data;
 
-        // Use o cheerio para carregar o HTML
             const $ = cheerio.load(html);
 
             ogData = {
@@ -170,10 +255,28 @@ async function getOpenGraphData(id) {
         } catch (error) {
             console.error('Erro ao obter os dados do OpenGraph:', error.message);
         }
+
+        attempt++;
+
+        if (!ogData && attempt <= maxAttempts) {
+            await new Promise((resolve) => setTimeout(resolve, delay));
+        }
     }
-    console.log(ogData)
+
+    console.log(ogData);
     return ogData;
 }
+
+function hasUndefinedValues(obj) {
+    for (let key in obj) {
+        if (obj[key] === undefined) {
+            return true;
+        }
+    }
+    return false;
+}
+
+
 
 async function replyMsg(message, productId, shortUrl, metaData){
     //console.log(metaData)

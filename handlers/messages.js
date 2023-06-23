@@ -29,12 +29,8 @@ module.exports = (client) => {
                 const url = match.input;
                 try {
                     const productId = await getProductId(url)
-                    const shortUrl = await getShotUrl(productId)
-                    const metaData = await getProductInfo(productId)               
-                    console.log('ID do produto: ' + productId);
-                    console.log('URL Reduzida: ' + shortUrl);
-                    console.log('Meta: ' + metaData.image)
-                    await replyMsg(message, productId, shortUrl, metaData)                    
+                    //console.log('Meta: ' + metaData.image)
+                    await replyMsg(message, productId)                    
                 } catch (err) {
                     console.log(err)
                 }  
@@ -98,19 +94,20 @@ async function getShotUrl(id) {
     console.log('ID recebida para api: ' + id);
     //const apiUrl = 'http://127.0.0.1:8000/api/ali/' + id;
     const apiUrl = 'http://aliapi/api/ali/' + id;
-    return new Promise((resolve, reject) => {
-        axios.get(apiUrl)
-        .then(function(response) {
-            console.log("Resultado API: " + response.data.link[0].promotion_link);
-            //console.log(response.status);
-            //console.log(response.statusText);
-            resolve(response.data.link[0].promotion_link);
-        })
-        .catch(function(error) {
-            //console.error(error);
-            reject(error);
-        });
-    });
+    try {
+        const response = await axios.get(apiUrl);
+        const data = {
+            title: response.data.title,
+            link: response.data.link,
+            price: response.data.price,
+            image: response.data.image,
+            discount: response.data.discount
+        };
+
+        return data;
+    } catch (error) {
+        console.log(error);
+    }
 }
 
 // async function getOpenGraphData(id) {
@@ -267,48 +264,49 @@ async function getShotUrl(id) {
 //     return ogData;
 // }
 
-async function getProductInfo(id){
-    const apiUrl = 'http://aliapi/api/product/' + id;
-    //const apiUrl = 'http://127.0.0.1:8000/api/product/' + id;
-    return new Promise((resolve, reject) => {
-        axios.get(apiUrl)
-        .then(function(response) {
-            console.log("Resultado API: " + response.data);
-            //console.log(response.status);
-            //console.log(response.statusText);
-            resolve(response.data);
-        })
-        .catch(function(error) {
-            //console.error(error);
-            reject(error);
-        });
-    });
-}
+// async function getProductInfo(id){
+//     const apiUrl = 'http://aliapi/api/product/' + id;
+//     //const apiUrl = 'http://127.0.0.1:8000/api/product/' + id;
+//     return new Promise((resolve, reject) => {
+//         axios.get(apiUrl)
+//         .then(function(response) {
+//             console.log("Resultado API: " + response.data);
+//             //console.log(response.status);
+//             //console.log(response.statusText);
+//             resolve(response.data);
+//         })
+//         .catch(function(error) {
+//             //console.error(error);
+//             reject(error);
+//         });
+//     });
+// }
 
 async function replyMsg(message, productId, shortUrl, metaData){
+    const data = await getShotUrl(productId);
     //console.log(metaData)
     const productMessage = new EmbedBuilder()
         .setColor(0x0099FF)
-        .setTitle(metaData.title)
-        .setURL(shortUrl)
-        .setAuthor({ name: 'Venão', iconURL: metaData.image, url: shortUrl })
-        .setDescription(metaData.title)
-        .setThumbnail(metaData.image)
-        .setImage(metaData.image)
+        .setTitle(data.title)
+        .setURL(data.link)
+        .setAuthor({ name: 'Venão', iconURL: data.image, url: data.link })
+        .setDescription(data.title)
+        .setThumbnail(data.image)
+        .setImage(data.image)
         .setTimestamp()
-        .setFooter({ text: 'Aproveite esta oferta incrível!', iconURL: metaData.image });    
+        .setFooter({ text: 'Aproveite esta oferta incrível!', iconURL: data.image });    
     message.reply({embeds: [productMessage]})
         .then(msg => setTimeout(() => message.delete(), 3000))
-        .then(sendToTelegram(shortUrl, metaData))
+        .then(sendToTelegram(data))
 }
 
-async function sendToTelegram(shortUrl, metaData){
+async function sendToTelegram(data){
     const url = 'https://api.telegram.org/bot';
     const apiToken = process.env.TELEGRAM_TOKEN;
-    console.log('Url recebida para enviar para o telegram: ' + shortUrl)
+    console.log('Url recebida para enviar para o telegram: ' + data.link)
     const chat_id = process.env.TELEGRAM_CHAT
-    const caption = `Confira esse produto que foi compartilhado no Discord! Talvez seja do seu interesse! ${metaData.ogTitle} ${shortUrl}`
-    const photo = metaData.ogImage[0].url.toString() + '?random=64'
+    const caption = `Confira esse produto que foi compartilhado no Discord! Talvez seja do seu interesse! ${data.title} ${data.link}`
+    const photo = data.image.toString() + '?random=64'
     //tg.telegram.sendMessage(chatId, text)
     axios.post(`${url}${apiToken}/sendPhoto`,
     {

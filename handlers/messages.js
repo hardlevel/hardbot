@@ -4,7 +4,8 @@ const filter = ['ajuda','ajude','me ajuda','socorro','urgente']
 const { MessageManager, EmbedBuilder } = require('discord.js')
 const axios = require('axios');
 const { urlencoded } = require('express');
-const { cheerio } = require('cheerio')
+const fetch = require('node-fetch');
+const cheerio = require('cheerio');
 
 module.exports = (client) => {
     client.on('messageCreate', async message => {        
@@ -100,59 +101,78 @@ async function getShotUrl(id) {
         axios.get(apiUrl)
         .then(function(response) {
             console.log("Resultado API: " + response.data.link[0].promotion_link);
-            console.log(response.status);
-            console.log(response.statusText);
+            //console.log(response.status);
+            //console.log(response.statusText);
             resolve(response.data.link[0].promotion_link);
         })
         .catch(function(error) {
-            console.error(error);
+            //console.error(error);
             reject(error);
         });
     });
 }
 
+// async function getOpenGraphData(id) {
+//     const url = `https://pt.aliexpress.com/item/${id}.html`
+//     const ogs = require('open-graph-scraper');
+//     const options = { url: `https://pt.aliexpress.com/item/${id}.html`, redirect: "error" };
+
+//     let result;
+//     let attempts = 0;
+
+//     while (attempts < 100 && (!result || !result.ogTitle)) {
+//         try {
+//             const { error, html, result: ogResult, response } = await ogs(options);
+
+//             //console.log('error:', error);
+//             //console.log('result:', ogResult);
+
+//             result = ogResult;
+//             attempts++;
+//         } catch (error) {
+//             console.error('Error:', error);
+//             return null;
+//         }
+//     }
+
+//     if (result && result.ogTitle) {
+//         return result;
+//     } else {
+//         return null;
+//     }
+// }
+
 async function getOpenGraphData(id) {
-
     const url = `https://pt.aliexpress.com/item/${id}.html`
-    // axios.get(url, {maxRedirects: 0})
-    // .then(res => {
-    //     console.log(typeof res.data)
-    //     const $ = cheerio.load(res.data.toString())
-    //     console.log($)
-    //     $('meta[property^="og:"]').each((index, element) => {
-    //         console.log(element)
-    //     });
+    let ogData = null;
 
-
-    // }).catch(err => console.error(err))
-
-
-    const ogs = require('open-graph-scraper');
-    const options = { url: `https://pt.aliexpress.com/item/${id}.html`, redirect: "error" };
-
-    let result;
-    let attempts = 0;
-
-    while (attempts < 100 && (!result || !result.ogTitle)) {
+    while (!ogData) {
+        console.log('Tentando resgatar informações...')
         try {
-            const { error, html, result: ogResult, response } = await ogs(options);
+            console.log('começando...')
+            const response = await fetch(url, { redirect: 'manual' });
 
-            //console.log('error:', error);
-            //console.log('result:', ogResult);
+            if (!response.ok) {
+                throw new Error('Erro ao obter o conteúdo da URL.');
+            }
 
-            result = ogResult;
-            attempts++;
+            const html = await response.text();
+
+        // Use o cheerio para carregar o HTML
+            const $ = cheerio.load(html);
+
+            ogData = {
+                ogTitle: $('meta[property="og:title"]').attr('content'),
+                ogDescription: $('meta[property="og:description"]').attr('content'),
+                ogImage: $('meta[property="og:image"]').attr('content'),
+                // Adicione outras tags OpenGraph que você precisa extrair
+            };
         } catch (error) {
-            console.error('Error:', error);
-            return null;
+            console.error('Erro ao obter os dados do OpenGraph:', error.message);
         }
     }
-
-    if (result && result.ogTitle) {
-        return result;
-    } else {
-        return null;
-    }
+    console.log(ogData)
+    return ogData;
 }
 
 async function replyMsg(message, productId, shortUrl, metaData){

@@ -92,8 +92,8 @@ async function getProductId(url) {
 
 async function getShotUrl(id) {
     console.log('ID recebida para api: ' + id);
-    //const apiUrl = 'http://127.0.0.1:8000/api/ali/' + id;
-    const apiUrl = 'http://aliapi/api/ali/' + id;
+    const apiUrl = process.env.API_URL + id;
+    //const apiUrl = 'http://aliapi/api/ali/' + id;
     try {
         const response = await axios.get(apiUrl);
         const data = {
@@ -297,7 +297,7 @@ async function replyMsg(message, productId, shortUrl, metaData){
         .setFooter({ text: 'Aproveite esta oferta incrível!', iconURL: data.image });    
     message.reply({embeds: [productMessage]})
         .then(msg => setTimeout(() => message.delete(), 3000))
-        .then(sendToTelegram(data))
+        //.then(sendToTelegram(data))
 }
 
 async function sendToTelegram(data){

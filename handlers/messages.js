@@ -96,13 +96,19 @@ async function getShotUrl(id) {
     //const apiUrl = 'http://aliapi/api/ali/' + id;
     try {
         const response = await axios.get(apiUrl);
-        const data = {
-            title: response.data.title,
-            link: response.data.link,
-            price: response.data.price,
-            image: response.data.image,
-            discount: response.data.discount
-        };
+        let data = ''
+        if(response.data.erro){
+            //console.log('O produto não suporta link de afiliado :(')
+            data = { erro: "O produto não suporta link de afiliado :(" }
+        } else {
+            data = {
+                title: response.data.title,
+                link: response.data.link,
+                price: response.data.price,
+                image: response.data.image,
+                discount: response.data.discount
+            };
+        }
 
         return data;
     } catch (error) {
@@ -284,21 +290,26 @@ async function getShotUrl(id) {
 
 async function replyMsg(message, productId, shortUrl, metaData){
     const data = await getShotUrl(productId);
-    console.log('URL Reduzida: ' + data.link)
-    //console.log(metaData)
-    const productMessage = new EmbedBuilder()
-        .setColor(0x0099FF)
-        .setTitle(data.title)
-        .setURL(data.link)
-        .setAuthor({ name: 'Venão', iconURL: data.image, url: data.link })
-        .setDescription(data.title)
-        .setThumbnail(data.image)
-        .setImage(data.image)
-        .setTimestamp()
-        .setFooter({ text: 'Aproveite esta oferta incrível!', iconURL: data.image });    
-    message.reply({embeds: [productMessage]})
-        .then(msg => setTimeout(() => message.delete(), 3000))
-        .then(sendToTelegram(data))
+    console.log('Retorno da API:' + data.erro)
+    if (data.erro){
+        message.reply('O produto não tem suporte a link de afiliado, use o link original')
+    } else {
+        console.log('URL Reduzida: ' + data.link)
+        console.log(metaData)
+        const productMessage = new EmbedBuilder()
+            .setColor(0x0099FF)
+            .setTitle(data.title)
+            .setURL(data.link)
+            .setAuthor({ name: 'Venão', iconURL: data.image, url: data.link })
+            .setDescription(data.title)
+            .setThumbnail(data.image)
+            .setImage(data.image)
+            .setTimestamp()
+            .setFooter({ text: 'Aproveite esta oferta incrível!', iconURL: data.image });    
+        message.reply({embeds: [productMessage]})
+            .then(msg => setTimeout(() => message.delete(), 3000))
+            .then(sendToTelegram(data))
+    }
 }
 
 async function sendToTelegram(data){

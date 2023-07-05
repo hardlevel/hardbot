@@ -101,6 +101,9 @@ async function getShotUrl(id) {
             //console.log('O produto não suporta link de afiliado :(')
             data = { erro: "O produto não suporta link de afiliado :(" }
         } else {
+            console.log(response.data);
+            console.log(response.status);
+            console.log(response.statusText);            
             data = {
                 title: response.data.title,
                 link: response.data.link,
@@ -290,11 +293,7 @@ async function getShotUrl(id) {
 
 async function replyMsg(message, productId, shortUrl, metaData){
     const data = await getShotUrl(productId);
-    console.log('Retorno da API:' + data)
-    if (data.erro == undefined){
-        message.reply('Houve um erro ao tentar gerar o bot, contate o administrador, se você for o administrar, meu amigo, você tá lascada pra resolver essa buxa, boa sorte!')
-        return
-    }
+    
     if (data.erro){
         message.reply('O produto não tem suporte a link de afiliado, use o link original: https://pt.aliexpress.com/item' + productId + '.html')
         return

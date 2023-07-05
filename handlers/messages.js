@@ -293,9 +293,11 @@ async function replyMsg(message, productId, shortUrl, metaData){
     console.log('Retorno da API:' + data.erro)
     if (data.erro = undefined){
         message.reply('Houve um erro ao tentar gerar o bot, contate o administrador, se você for o administrar, meu amigo, você tá lascada pra resolver essa buxa, boa sorte!')
+        return
     }
     if (data.erro){
-        message.reply('O produto não tem suporte a link de afiliado, use o link original')
+        message.reply('O produto não tem suporte a link de afiliado, use o link original: https://pt.aliexpress.com/item' + productId + '.html')
+        return
     } else {
         console.log('URL Reduzida: ' + data.link)
         console.log(metaData)

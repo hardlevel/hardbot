@@ -292,7 +292,7 @@ async function replyMsg(message, productId, shortUrl, metaData){
     const data = await getShotUrl(productId);
 
     if (data && data.erro) {
-        message.reply('O produto não tem suporte a link de afiliado, use o link original: https://pt.aliexpress.com/item' + productId + '.html')
+        message.reply('O produto não tem suporte a link de afiliado, use o link original: https://pt.aliexpress.com/item/' + productId + '.html')
         return
     } else {
         console.log('URL Reduzida: ' + data.link)

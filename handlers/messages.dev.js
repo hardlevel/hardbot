@@ -369,26 +369,16 @@ function replyMsg(message, productId, shortUrl, metaData) {
 
         case 2:
           data = _context5.sent;
-          console.log('Retorno da API:' + data);
 
-          if (!(data.erro == undefined)) {
-            _context5.next = 7;
-            break;
-          }
-
-          message.reply('Houve um erro ao tentar gerar o bot, contate o administrador, se você for o administrar, meu amigo, você tá lascada pra resolver essa buxa, boa sorte!');
-          return _context5.abrupt("return");
-
-        case 7:
           if (!data.erro) {
-            _context5.next = 12;
+            _context5.next = 8;
             break;
           }
 
           message.reply('O produto não tem suporte a link de afiliado, use o link original: https://pt.aliexpress.com/item' + productId + '.html');
           return _context5.abrupt("return");
 
-        case 12:
+        case 8:
           console.log('URL Reduzida: ' + data.link);
           console.log(metaData);
           productMessage = new EmbedBuilder().setColor(0x0099FF).setTitle(data.title).setURL(data.link).setAuthor({
@@ -407,7 +397,7 @@ function replyMsg(message, productId, shortUrl, metaData) {
             }, 3000);
           }).then(sendToTelegram(data));
 
-        case 16:
+        case 12:
         case "end":
           return _context5.stop();
       }

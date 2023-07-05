@@ -101,9 +101,6 @@ async function getShotUrl(id) {
             //console.log('O produto não suporta link de afiliado :(')
             data = { erro: "O produto não suporta link de afiliado :(" }
         } else {
-            console.log(response.data);
-            console.log(response.status);
-            console.log(response.statusText);            
             data = {
                 title: response.data.title,
                 link: response.data.link,
@@ -293,8 +290,8 @@ async function getShotUrl(id) {
 
 async function replyMsg(message, productId, shortUrl, metaData){
     const data = await getShotUrl(productId);
-    
-    if (data.erro){
+
+    if (data && data.erro) {
         message.reply('O produto não tem suporte a link de afiliado, use o link original: https://pt.aliexpress.com/item' + productId + '.html')
         return
     } else {

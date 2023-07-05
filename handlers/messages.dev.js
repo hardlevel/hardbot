@@ -192,9 +192,6 @@ function getShotUrl(id) {
               erro: "O produto não suporta link de afiliado :("
             };
           } else {
-            console.log(response.data);
-            console.log(response.status);
-            console.log(response.statusText);
             data = {
               title: response.data.title,
               link: response.data.link,
@@ -370,7 +367,7 @@ function replyMsg(message, productId, shortUrl, metaData) {
         case 2:
           data = _context5.sent;
 
-          if (!data.erro) {
+          if (!(data && data.erro)) {
             _context5.next = 8;
             break;
           }

@@ -199,7 +199,9 @@ function getShotUrl(id) {
               link: response.data.link,
               price: response.data.price,
               image: response.data.image,
-              discount: response.data.discount
+              discount: response.data.discount,
+              category1: response.data.category1,
+              category2: response.data.category2
             };
           }
 
@@ -381,7 +383,7 @@ function replyMsg(message, productId, shortUrl, metaData) {
           console.log('URL Reduzida: ' + data.link);
           console.log(metaData);
           productMessage = new EmbedBuilder().setColor(0x0099FF).setTitle(data.title).setURL(data.link).setAuthor({
-            name: 'Venão',
+            name: 'HardLevel',
             iconURL: data.image,
             url: data.link
           }).setDescription(data.title).setThumbnail(data.image).addFields({

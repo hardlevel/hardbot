@@ -304,6 +304,11 @@ async function replyMsg(message, productId, shortUrl, metaData){
             .setAuthor({ name: 'Venão', iconURL: data.image, url: data.link })
             .setDescription(data.title)
             .setThumbnail(data.image)
+            .addFields(                
+                { name: 'Preço', value: data.price, inline: true },
+                { name: 'Categoria primária', value: data.category1, inline: true },
+                { name: 'Categoria secundária', value: data.category2 , inline: true, inline: true },
+            )
             .setImage(data.image)
             .setTimestamp()
             .setFooter({ text: 'Aproveite esta oferta incrível!', iconURL: data.image });    

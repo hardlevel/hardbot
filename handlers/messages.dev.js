@@ -1,5 +1,7 @@
 "use strict";
 
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 var _require = require('../index'),
     client = _require.client;
 
@@ -382,7 +384,19 @@ function replyMsg(message, productId, shortUrl, metaData) {
             name: 'Venão',
             iconURL: data.image,
             url: data.link
-          }).setDescription(data.title).setThumbnail(data.image).setImage(data.image).setTimestamp().setFooter({
+          }).setDescription(data.title).setThumbnail(data.image).addFields({
+            name: 'Preço',
+            value: data.price,
+            inline: true
+          }, {
+            name: 'Categoria primária',
+            value: data.category1,
+            inline: true
+          }, _defineProperty({
+            name: 'Categoria secundária',
+            value: data.category2,
+            inline: true
+          }, "inline", true)).setImage(data.image).setTimestamp().setFooter({
             text: 'Aproveite esta oferta incrível!',
             iconURL: data.image
           });

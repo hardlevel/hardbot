@@ -374,7 +374,7 @@ function replyMsg(message, productId, shortUrl, metaData) {
             break;
           }
 
-          message.reply('O produto não tem suporte a link de afiliado, use o link original: https://pt.aliexpress.com/item' + productId + '.html');
+          message.reply('O produto não tem suporte a link de afiliado, use o link original: https://pt.aliexpress.com/item/' + productId + '.html');
           return _context5.abrupt("return");
 
         case 8:

@@ -366,9 +366,9 @@ function replyMsg(message, productId, shortUrl, metaData) {
 
         case 2:
           data = _context5.sent;
-          console.log('Retorno da API:' + data.erro);
+          console.log('Retorno da API:' + data);
 
-          if (!(data.erro = undefined)) {
+          if (!(data.erro == undefined)) {
             _context5.next = 7;
             break;
           }

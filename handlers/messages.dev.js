@@ -368,33 +368,43 @@ function replyMsg(message, productId, shortUrl, metaData) {
           data = _context5.sent;
           console.log('Retorno da API:' + data.erro);
 
-          if (data.erro = undefined) {
-            message.reply('Houve um erro ao tentar gerar o bot, contate o administrador, se você for o administrar, meu amigo, você tá lascada pra resolver essa buxa, boa sorte!');
+          if (!(data.erro = undefined)) {
+            _context5.next = 7;
+            break;
           }
 
-          if (data.erro) {
-            message.reply('O produto não tem suporte a link de afiliado, use o link original');
-          } else {
-            console.log('URL Reduzida: ' + data.link);
-            console.log(metaData);
-            productMessage = new EmbedBuilder().setColor(0x0099FF).setTitle(data.title).setURL(data.link).setAuthor({
-              name: 'Venão',
-              iconURL: data.image,
-              url: data.link
-            }).setDescription(data.title).setThumbnail(data.image).setImage(data.image).setTimestamp().setFooter({
-              text: 'Aproveite esta oferta incrível!',
-              iconURL: data.image
-            });
-            message.reply({
-              embeds: [productMessage]
-            }).then(function (msg) {
-              return setTimeout(function () {
-                return message["delete"]();
-              }, 3000);
-            }).then(sendToTelegram(data));
+          message.reply('Houve um erro ao tentar gerar o bot, contate o administrador, se você for o administrar, meu amigo, você tá lascada pra resolver essa buxa, boa sorte!');
+          return _context5.abrupt("return");
+
+        case 7:
+          if (!data.erro) {
+            _context5.next = 12;
+            break;
           }
 
-        case 6:
+          message.reply('O produto não tem suporte a link de afiliado, use o link original: https://pt.aliexpress.com/item' + productId + '.html');
+          return _context5.abrupt("return");
+
+        case 12:
+          console.log('URL Reduzida: ' + data.link);
+          console.log(metaData);
+          productMessage = new EmbedBuilder().setColor(0x0099FF).setTitle(data.title).setURL(data.link).setAuthor({
+            name: 'Venão',
+            iconURL: data.image,
+            url: data.link
+          }).setDescription(data.title).setThumbnail(data.image).setImage(data.image).setTimestamp().setFooter({
+            text: 'Aproveite esta oferta incrível!',
+            iconURL: data.image
+          });
+          message.reply({
+            embeds: [productMessage]
+          }).then(function (msg) {
+            return setTimeout(function () {
+              return message["delete"]();
+            }, 3000);
+          }).then(sendToTelegram(data));
+
+        case 16:
         case "end":
           return _context5.stop();
       }

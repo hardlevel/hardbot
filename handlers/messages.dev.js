@@ -368,6 +368,10 @@ function replyMsg(message, productId, shortUrl, metaData) {
           data = _context5.sent;
           console.log('Retorno da API:' + data.erro);
 
+          if (data.erro = undefined) {
+            message.reply('Houve um erro ao tentar gerar o bot, contate o administrador, se você for o administrar, meu amigo, você tá lascada pra resolver essa buxa, boa sorte!');
+          }
+
           if (data.erro) {
             message.reply('O produto não tem suporte a link de afiliado, use o link original');
           } else {
@@ -390,7 +394,7 @@ function replyMsg(message, productId, shortUrl, metaData) {
             }).then(sendToTelegram(data));
           }
 
-        case 5:
+        case 6:
         case "end":
           return _context5.stop();
       }

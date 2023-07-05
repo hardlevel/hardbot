@@ -291,6 +291,9 @@ async function getShotUrl(id) {
 async function replyMsg(message, productId, shortUrl, metaData){
     const data = await getShotUrl(productId);
     console.log('Retorno da API:' + data.erro)
+    if (data.erro = undefined){
+        message.reply('Houve um erro ao tentar gerar o bot, contate o administrador, se você for o administrar, meu amigo, você tá lascada pra resolver essa buxa, boa sorte!')
+    }
     if (data.erro){
         message.reply('O produto não tem suporte a link de afiliado, use o link original')
     } else {

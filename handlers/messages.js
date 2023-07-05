@@ -101,6 +101,9 @@ async function getShotUrl(id) {
             //console.log('O produto não suporta link de afiliado :(')
             data = { erro: "O produto não suporta link de afiliado :(" }
         } else {
+            console.log(response.data);
+            console.log(response.status);
+            console.log(response.statusText);            
             data = {
                 title: response.data.title,
                 link: response.data.link,

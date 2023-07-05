@@ -106,7 +106,9 @@ async function getShotUrl(id) {
                 link: response.data.link,
                 price: response.data.price,
                 image: response.data.image,
-                discount: response.data.discount
+                discount: response.data.discount,
+                category1: response.data.category1,
+                category2: response.data.category2
             };
         }
 
@@ -301,7 +303,7 @@ async function replyMsg(message, productId, shortUrl, metaData){
             .setColor(0x0099FF)
             .setTitle(data.title)
             .setURL(data.link)
-            .setAuthor({ name: 'Venão', iconURL: data.image, url: data.link })
+            .setAuthor({ name: 'HardLevel', iconURL: data.image, url: data.link })
             .setDescription(data.title)
             .setThumbnail(data.image)
             .addFields(                

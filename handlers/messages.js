@@ -1,6 +1,6 @@
 const { client } = require('../index')
 const alertForum = "Seu post em nosso forum não pode ser aprovado pois o título possui palavras não permitidas ou é curto demais, por favor leia as regras com atenção antes de enviar mensagens no server. \n Mensagens com titulos extremamente vagos que não detalham o problema não serão aprovados!"
-const filter = ['ajuda','ajude','me ajuda','socorro','urgente']
+const filter = ['ajuda', 'ajude', 'me ajuda', 'socorro', 'urgente']
 const { MessageManager, EmbedBuilder } = require('discord.js')
 const axios = require('axios');
 const { urlencoded } = require('express');
@@ -9,13 +9,13 @@ const cheerio = require('cheerio');
 
 
 module.exports = (client) => {
-    client.on('messageCreate', async message => {        
+    client.on('messageCreate', async message => {
         //console.log(message)
         const author = message.author
         const content = message.content
         const channel = client.channels.cache.get(message.channelId);
         console.log(author.username + ' - ' + channel.name + ' - ' + content)
-        if (author != '1063528592648192011'){
+        if (author != '1063528592648192011') {
             console.log('mensagem não é do bot')
             //const regex = /https?:\/\/.*?aliexpress\.com\/item\/(\d+)\.html/i;
             //const regex = /https?:\/\/(?:.*?\.?aliexpress\.com\/(?:[^\/]+\/)?(?:[^\/]+\/)?(?:item\/)?([\w-]+)(?:\.html)?|(?:[^\/]+\.)?(?:[a-z]+\.)?aliexpress\.com\/(?:e|item)\/([\w-]+))/i;
@@ -23,26 +23,24 @@ module.exports = (client) => {
             const regex = /((http|ftp|https):\/\/)?(([\w.-]*)\.aliexpress\.com([:\d]*)?)([\w.-\/]*)*/i;
 
             const match = content.match(regex);
-        
+
             if (match) {
                 //console.log(match.input)
                 const url = match.input;
-                try {
-                    (async function(){                        
-                        const id = await new Promise((resolve, reject) => {
-                            getProductId(url)
-                                .then((id) => resolve(id))
-                                .catch((err) => reject(err));
-                        });
-                    
-                        const data = await getShotUrl(id)
-                        await replyMsg(message, id, data)
-                    })();
-                    //const productId = await getProductId(url)
-                    //console.log('Meta: ' + metaData.image)                    
-                } catch (err) {
-                    console.log(err)
-                }  
+                (async function () {
+                    try {
+                        //getProductId(url)
+                        //getShotUrl(productId)
+                        //replyMsg(message, productId, data)
+                            const productId = await getProductId(url)
+                            const data = await getShortUrl(productId)
+                            await replyMsg(message, productId, data )
+                            //const productId = await getProductId(url)
+                            //console.log('Meta: ' + metaData.image)                    
+                        } catch (err) {
+                            console.log(err)
+                    }
+                })()
             }
         }
     });
@@ -52,8 +50,8 @@ module.exports = (client) => {
         let postMember = thread.ownerId
         let messageId = thread.id
         let channelId = thread.parentId
-        if (thread.parent.type === 15){
-            if (filter.some(substring=>thread.name.includes(substring))){
+        if (thread.parent.type === 15) {
+            if (filter.some(substring => thread.name.includes(substring))) {
                 client.users.send(postMember, alertForum);
                 thread.delete()
             }
@@ -66,10 +64,39 @@ module.exports = (client) => {
     })
 }
 
+async function replyMsg(message, productId, data) {
+    console.log(data)
+    if (data && data.erro) {
+        message.reply('O produto não tem suporte a link de afiliado, use o link original: https://pt.aliexpress.com/item/' + productId + '.html')
+        return
+    } else {
+        console.log('URL Reduzida: ' + data.link)
+        console.log(data)
+        const productMessage = new EmbedBuilder()
+            .setColor(0x0099FF)
+            .setTitle(data.title)
+            .setURL(data.link)
+            .setAuthor({ name: 'HardLevel', iconURL: data.image, url: data.link })
+            .setDescription(data.title)
+            .setThumbnail(data.image)
+            .addFields(
+                { name: 'Preço', value: data.price, inline: true },
+                { name: 'Categoria primária', value: data.category1, inline: true },
+                { name: 'Categoria secundária', value: data.category2, inline: true, inline: true },
+            )
+            .setImage(data.image)
+            .setTimestamp()
+            .setFooter({ text: 'Aproveite esta oferta incrível!', iconURL: data.image });
+        message.reply({ embeds: [productMessage] })
+            .then(msg => setTimeout(() => message.delete(), 3000))
+            .then(sendToTelegram(data))
+    }
+}
+
 async function getProductId(url) {
     console.log('URL recebida para obter ID: ' + url)
     let finalUrl = ''
-    if (url.includes('/item/')){
+    if (url.includes('/item/')) {
         console.log('Url não reduzida identificada, capturando id...')
         const newUrl = new URL(url)
         const productPath = newUrl.pathname
@@ -81,42 +108,33 @@ async function getProductId(url) {
     } else {
         console.log('URL reduzida identificada, tentando descobrir URL original...')
         finalUrl = url
-        try{
-            //metodo antigo com axios
-            //const response = await axios.get(finalUrl)
-            //
-            //metodo novo com node fetch, precisa atualizad o node
-            fetch(finalUrl,{redirect: 'follow', method: 'GET'})
-                .then(function(res) {
-                    console.log('URL final identificada: ' + res.url)
-                    const productUrl = new URL(res.url)
-                    const productPath = productUrl.pathname
-                    console.log('Parte 1: ' + productPath)
-                    //console.log(productUrl)
-                    const regex = /\/item\/(\d+)\.html/
-                    const match = productPath.match(regex);
-                    const productId = match[1]
-                    console.log('ID do produto: ' + productId)
-                    return productId
-                })
-                .catch(function(err) {
-                    console.log(err)
-                });
-        } catch(err) {
+        try {
+            const res = await fetch(finalUrl, { redirect: 'follow', method: 'GET' });
+            console.log('URL final identificada: ' + res.url)
+            const productUrl = new URL(res.url)
+            const productPath = productUrl.pathname
+            console.log('Parte 1: ' + productPath)
+            const regex = /\/item\/(\d+)\.html/
+            const match = productPath.match(regex);
+            const productId = match[1]
+            console.log('ID do produto: ' + productId)
+            return productId
+        } catch (err) {
             console.log(err)
         }
     }
 }
 
-async function getShotUrl(id) {
-    if (id == undefined){console.log('ID não definida!')}
+
+async function getShortUrl(id) {
+    if (id == undefined) { console.log('ID não definida!') }
     console.log('ID recebida para api: ' + id);
     const apiUrl = process.env.API_URL + id;
     //const apiUrl = 'http://aliapi/api/ali/' + id;
     try {
         const response = await axios.get(apiUrl);
         let data = ''
-        if(response.data.erro){
+        if (response.data.erro) {
             //console.log('O produto não suporta link de afiliado :(')
             data = { erro: "O produto não suporta link de afiliado :(" }
         } else {
@@ -137,209 +155,7 @@ async function getShotUrl(id) {
     }
 }
 
-// async function getOpenGraphData(id) {
-//     const url = `https://pt.aliexpress.com/item/${id}.html`
-//     const ogs = require('open-graph-scraper');
-//     const options = { url: `https://pt.aliexpress.com/item/${id}.html`, redirect: "error" };
-
-//     let result;
-//     let attempts = 0;
-
-//     while (attempts < 100 && (!result || !result.ogTitle)) {
-//         try {
-//             const { error, html, result: ogResult, response } = await ogs(options);
-
-//             //console.log('error:', error);
-//             //console.log('result:', ogResult);
-
-//             result = ogResult;
-//             attempts++;
-//         } catch (error) {
-//             console.error('Error:', error);
-//             return null;
-//         }
-//     }
-
-//     if (result && result.ogTitle) {
-//         return result;
-//     } else {
-//         return null;
-//     }
-// }
-
-// async function getOpenGraphData(id) {
-//     const url = `https://pt.aliexpress.com/item/${id}.html`
-//     let ogData = null;
-
-//     while (!ogData) {
-//         console.log('Tentando resgatar informações...')
-//         try {
-//             console.log('começando...')
-//             // const response = await fetch(url, { redirect: 'manual' });
-
-//             // if (!response.ok) {
-//             //     throw new Error('Erro ao obter o conteúdo da URL.');
-//             // }
-//             const response = await axios.get(url, { follow: false });
-
-//             if (!response.status === 200) {
-//                 throw new Error('Erro ao obter o conteúdo da URL.');
-//             }
-
-//             //const html = await response.text();
-//             const html = await response.data;
-            
-//             // Use o cheerio para carregar o HTML
-//             const $ = cheerio.load(html);
-//             //console.log($)
-//             ogData = {
-//                 ogTitle: $('meta[property="og:title"]').attr('content'),
-//                 ogDescription: $('meta[property="og:description"]').attr('content'),
-//                 ogImage: $('meta[property="og:image"]').attr('content'),
-//                 // Adicione outras tags OpenGraph que você precisa extrair
-//             };
-//         } catch (error) {
-//             console.error('Erro ao obter os dados do OpenGraph:', error.message);
-//         }
-//     }
-//     console.log(ogData)
-//     return ogData;
-// }
-
-// async function getOpenGraphData(id) {
-//     const url = `https://pt.aliexpress.com/item/${id}.html`;
-//     const maxAttempts = 5;
-//     const delay = 1000; // tempo de espera em milissegundos
-//     let ogData = null;
-//     let attempt = 1;
-
-//     while (attempt <= maxAttempts && ogData === null) {
-//         console.log('Tentativa: ' + attempt);
-
-//         try {
-//             const response = await axios.get(url, { maxRedirects: 0 });
-    
-//             if (response.status !== 200) {
-//             throw new Error('Erro ao obter o conteúdo da URL.');
-//             }
-    
-//             const html = response.data;
-    
-//             // Use o cheerio para carregar o HTML
-//             const $ = cheerio.load(html);
-    
-//             ogData = {
-//             ogTitle: $('meta[property="og:title"]').attr('content'),
-//             ogDescription: $('meta[property="og:description"]').attr('content'),
-//             ogImage: $('meta[property="og:image"]').attr('content'),
-//             // Adicione outras tags OpenGraph que você precisa extrair
-//             };
-//         } catch (error) {
-//             console.error('Erro ao obter os dados do OpenGraph:', error.message);
-//         }
-    
-//         attempt++;
-    
-//         if (ogData === null && attempt <= maxAttempts) {
-//             await new Promise((resolve) => setTimeout(resolve, delay));
-//         }
-//         }
-    
-//         console.log(ogData);
-//         return ogData;
-// }
-
-// async function getOpenGraphData(id) {
-//     const url = `https://pt.aliexpress.com/item/${id}.html`;
-//     const maxAttempts = 50;
-//     const delay = 1000; // Delay entre as tentativas (em milissegundos)
-//     let ogData = null;
-//     let attempt = 1;
-
-//     while (attempt <= maxAttempts && (ogData === null || ogData === undefined || hasUndefinedValues(ogData))) {
-//         console.log('Tentativa: ' + attempt);
-
-//         try {
-//             const response = await axios.get(url, { maxRedirects: 0 });
-
-//             if (response.status !== 200) {
-//                 throw new Error('Erro ao obter o conteúdo da URL.');
-//             }
-
-//             const html = response.data;
-
-//             const $ = cheerio.load(html);
-
-//             ogData = {
-//                 ogTitle: $('meta[property="og:title"]').attr('content'),
-//                 ogDescription: $('meta[property="og:description"]').attr('content'),
-//                 ogImage: $('meta[property="og:image"]').attr('content'),
-//                 // Adicione outras tags OpenGraph que você precisa extrair
-//             };
-//         } catch (error) {
-//             console.error('Erro ao obter os dados do OpenGraph:', error.message);
-//         }
-
-//         attempt++;
-
-//         if (!ogData && attempt <= maxAttempts) {
-//             await new Promise((resolve) => setTimeout(resolve, delay));
-//         }
-//     }
-
-//     console.log(ogData);
-//     return ogData;
-// }
-
-// async function getProductInfo(id){
-//     const apiUrl = 'http://aliapi/api/product/' + id;
-//     //const apiUrl = 'http://127.0.0.1:8000/api/product/' + id;
-//     return new Promise((resolve, reject) => {
-//         axios.get(apiUrl)
-//         .then(function(response) {
-//             console.log("Resultado API: " + response.data);
-//             //console.log(response.status);
-//             //console.log(response.statusText);
-//             resolve(response.data);
-//         })
-//         .catch(function(error) {
-//             //console.error(error);
-//             reject(error);
-//         });
-//     });
-// }
-
-async function replyMsg(message, productId, data){
-    //const data = await getShotUrl(productId);
-    console.log(data)
-    if (data && data.erro) {
-        message.reply('O produto não tem suporte a link de afiliado, use o link original: https://pt.aliexpress.com/item/' + productId + '.html')
-        return
-    } else {
-        console.log('URL Reduzida: ' + data.link)
-        console.log(data)
-        const productMessage = new EmbedBuilder()
-            .setColor(0x0099FF)
-            .setTitle(data.title)
-            .setURL(data.link)
-            .setAuthor({ name: 'HardLevel', iconURL: data.image, url: data.link })
-            .setDescription(data.title)
-            .setThumbnail(data.image)
-            .addFields(                
-                { name: 'Preço', value: data.price, inline: true },
-                { name: 'Categoria primária', value: data.category1, inline: true },
-                { name: 'Categoria secundária', value: data.category2 , inline: true, inline: true },
-            )
-            .setImage(data.image)
-            .setTimestamp()
-            .setFooter({ text: 'Aproveite esta oferta incrível!', iconURL: data.image });    
-        message.reply({embeds: [productMessage]})
-            .then(msg => setTimeout(() => message.delete(), 3000))
-            .then(sendToTelegram(data))
-    }
-}
-
-async function sendToTelegram(data){
+async function sendToTelegram(data) {
     const url = 'https://api.telegram.org/bot';
     const apiToken = process.env.TELEGRAM_TOKEN;
     console.log('Url recebida para enviar para o telegram: ' + data.link)
@@ -348,9 +164,9 @@ async function sendToTelegram(data){
     const photo = data.image
     //tg.telegram.sendMessage(chatId, text)
     axios.post(`${url}${apiToken}/sendPhoto`,
-    {
-        chat_id,
-        caption,
-        photo
-    })
+        {
+            chat_id,
+            caption,
+            photo
+        })
 }

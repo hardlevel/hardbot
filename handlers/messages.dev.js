@@ -46,44 +46,42 @@ module.exports = function (client) {
                 //console.log(match.input)
                 url = match.input;
 
-                try {
-                  (function _callee() {
-                    var id, data;
-                    return regeneratorRuntime.async(function _callee$(_context) {
-                      while (1) {
-                        switch (_context.prev = _context.next) {
-                          case 0:
-                            _context.next = 2;
-                            return regeneratorRuntime.awrap(new Promise(function (resolve, reject) {
-                              getProductId(url).then(function (id) {
-                                return resolve(id);
-                              })["catch"](function (err) {
-                                return reject(err);
-                              });
-                            }));
+                (function _callee() {
+                  var productId, data;
+                  return regeneratorRuntime.async(function _callee$(_context) {
+                    while (1) {
+                      switch (_context.prev = _context.next) {
+                        case 0:
+                          _context.prev = 0;
+                          _context.next = 3;
+                          return regeneratorRuntime.awrap(getProductId(url));
 
-                          case 2:
-                            id = _context.sent;
-                            _context.next = 5;
-                            return regeneratorRuntime.awrap(getShotUrl(id));
+                        case 3:
+                          productId = _context.sent;
+                          _context.next = 6;
+                          return regeneratorRuntime.awrap(getShortUrl(productId));
 
-                          case 5:
-                            data = _context.sent;
-                            _context.next = 8;
-                            return regeneratorRuntime.awrap(replyMsg(message, id, data));
+                        case 6:
+                          data = _context.sent;
+                          _context.next = 9;
+                          return regeneratorRuntime.awrap(replyMsg(message, productId, data));
 
-                          case 8:
-                          case "end":
-                            return _context.stop();
-                        }
+                        case 9:
+                          _context.next = 14;
+                          break;
+
+                        case 11:
+                          _context.prev = 11;
+                          _context.t0 = _context["catch"](0);
+                          console.log(_context.t0);
+
+                        case 14:
+                        case "end":
+                          return _context.stop();
                       }
-                    });
-                  })(); //const productId = await getProductId(url)
-                  //console.log('Meta: ' + metaData.image)                    
-
-                } catch (err) {
-                  console.log(err);
-                }
+                    }
+                  }, null, null, [[0, 11]]);
+                })();
               }
             }
 
@@ -130,276 +128,21 @@ module.exports = function (client) {
   });
 };
 
-function getProductId(url) {
-  var finalUrl, newUrl, productPath, regex, match, productId;
-  return regeneratorRuntime.async(function getProductId$(_context4) {
+function replyMsg(message, productId, data) {
+  var productMessage;
+  return regeneratorRuntime.async(function replyMsg$(_context4) {
     while (1) {
       switch (_context4.prev = _context4.next) {
         case 0:
-          console.log('URL recebida para obter ID: ' + url);
-          finalUrl = '';
-
-          if (!url.includes('/item/')) {
-            _context4.next = 13;
-            break;
-          }
-
-          console.log('Url não reduzida identificada, capturando id...');
-          newUrl = new URL(url);
-          productPath = newUrl.pathname;
-          regex = /\/item\/(\d+)\.html/;
-          match = productPath.match(regex);
-          productId = match[1];
-          console.log('ID do produto: ' + productId);
-          return _context4.abrupt("return", productId);
-
-        case 13:
-          console.log('URL reduzida identificada, tentando descobrir URL original...');
-          finalUrl = url;
-
-          try {
-            //metodo antigo com axios
-            //const response = await axios.get(finalUrl)
-            //
-            //metodo novo com node fetch, precisa atualizad o node
-            fetch(finalUrl, {
-              redirect: 'follow',
-              method: 'GET'
-            }).then(function (res) {
-              console.log('URL final identificada: ' + res.url);
-              var productUrl = new URL(res.url);
-              var productPath = productUrl.pathname;
-              console.log('Parte 1: ' + productPath); //console.log(productUrl)
-
-              var regex = /\/item\/(\d+)\.html/;
-              var match = productPath.match(regex);
-              var productId = match[1];
-              console.log('ID do produto: ' + productId);
-              return productId;
-            })["catch"](function (err) {
-              console.log(err);
-            });
-          } catch (err) {
-            console.log(err);
-          }
-
-        case 16:
-        case "end":
-          return _context4.stop();
-      }
-    }
-  });
-}
-
-function getShotUrl(id) {
-  var apiUrl, response, data;
-  return regeneratorRuntime.async(function getShotUrl$(_context5) {
-    while (1) {
-      switch (_context5.prev = _context5.next) {
-        case 0:
-          if (id == undefined) {
-            console.log('ID não definida!');
-          }
-
-          console.log('ID recebida para api: ' + id);
-          apiUrl = process.env.API_URL + id; //const apiUrl = 'http://aliapi/api/ali/' + id;
-
-          _context5.prev = 3;
-          _context5.next = 6;
-          return regeneratorRuntime.awrap(axios.get(apiUrl));
-
-        case 6:
-          response = _context5.sent;
-          data = '';
-
-          if (response.data.erro) {
-            //console.log('O produto não suporta link de afiliado :(')
-            data = {
-              erro: "O produto não suporta link de afiliado :("
-            };
-          } else {
-            data = {
-              title: response.data.title,
-              link: response.data.link,
-              price: response.data.price,
-              image: response.data.image,
-              discount: response.data.discount,
-              category1: response.data.category1,
-              category2: response.data.category2
-            };
-          }
-
-          console.log(data);
-          return _context5.abrupt("return", data);
-
-        case 13:
-          _context5.prev = 13;
-          _context5.t0 = _context5["catch"](3);
-          console.log(_context5.t0);
-
-        case 16:
-        case "end":
-          return _context5.stop();
-      }
-    }
-  }, null, null, [[3, 13]]);
-} // async function getOpenGraphData(id) {
-//     const url = `https://pt.aliexpress.com/item/${id}.html`
-//     const ogs = require('open-graph-scraper');
-//     const options = { url: `https://pt.aliexpress.com/item/${id}.html`, redirect: "error" };
-//     let result;
-//     let attempts = 0;
-//     while (attempts < 100 && (!result || !result.ogTitle)) {
-//         try {
-//             const { error, html, result: ogResult, response } = await ogs(options);
-//             //console.log('error:', error);
-//             //console.log('result:', ogResult);
-//             result = ogResult;
-//             attempts++;
-//         } catch (error) {
-//             console.error('Error:', error);
-//             return null;
-//         }
-//     }
-//     if (result && result.ogTitle) {
-//         return result;
-//     } else {
-//         return null;
-//     }
-// }
-// async function getOpenGraphData(id) {
-//     const url = `https://pt.aliexpress.com/item/${id}.html`
-//     let ogData = null;
-//     while (!ogData) {
-//         console.log('Tentando resgatar informações...')
-//         try {
-//             console.log('começando...')
-//             // const response = await fetch(url, { redirect: 'manual' });
-//             // if (!response.ok) {
-//             //     throw new Error('Erro ao obter o conteúdo da URL.');
-//             // }
-//             const response = await axios.get(url, { follow: false });
-//             if (!response.status === 200) {
-//                 throw new Error('Erro ao obter o conteúdo da URL.');
-//             }
-//             //const html = await response.text();
-//             const html = await response.data;
-//             // Use o cheerio para carregar o HTML
-//             const $ = cheerio.load(html);
-//             //console.log($)
-//             ogData = {
-//                 ogTitle: $('meta[property="og:title"]').attr('content'),
-//                 ogDescription: $('meta[property="og:description"]').attr('content'),
-//                 ogImage: $('meta[property="og:image"]').attr('content'),
-//                 // Adicione outras tags OpenGraph que você precisa extrair
-//             };
-//         } catch (error) {
-//             console.error('Erro ao obter os dados do OpenGraph:', error.message);
-//         }
-//     }
-//     console.log(ogData)
-//     return ogData;
-// }
-// async function getOpenGraphData(id) {
-//     const url = `https://pt.aliexpress.com/item/${id}.html`;
-//     const maxAttempts = 5;
-//     const delay = 1000; // tempo de espera em milissegundos
-//     let ogData = null;
-//     let attempt = 1;
-//     while (attempt <= maxAttempts && ogData === null) {
-//         console.log('Tentativa: ' + attempt);
-//         try {
-//             const response = await axios.get(url, { maxRedirects: 0 });
-//             if (response.status !== 200) {
-//             throw new Error('Erro ao obter o conteúdo da URL.');
-//             }
-//             const html = response.data;
-//             // Use o cheerio para carregar o HTML
-//             const $ = cheerio.load(html);
-//             ogData = {
-//             ogTitle: $('meta[property="og:title"]').attr('content'),
-//             ogDescription: $('meta[property="og:description"]').attr('content'),
-//             ogImage: $('meta[property="og:image"]').attr('content'),
-//             // Adicione outras tags OpenGraph que você precisa extrair
-//             };
-//         } catch (error) {
-//             console.error('Erro ao obter os dados do OpenGraph:', error.message);
-//         }
-//         attempt++;
-//         if (ogData === null && attempt <= maxAttempts) {
-//             await new Promise((resolve) => setTimeout(resolve, delay));
-//         }
-//         }
-//         console.log(ogData);
-//         return ogData;
-// }
-// async function getOpenGraphData(id) {
-//     const url = `https://pt.aliexpress.com/item/${id}.html`;
-//     const maxAttempts = 50;
-//     const delay = 1000; // Delay entre as tentativas (em milissegundos)
-//     let ogData = null;
-//     let attempt = 1;
-//     while (attempt <= maxAttempts && (ogData === null || ogData === undefined || hasUndefinedValues(ogData))) {
-//         console.log('Tentativa: ' + attempt);
-//         try {
-//             const response = await axios.get(url, { maxRedirects: 0 });
-//             if (response.status !== 200) {
-//                 throw new Error('Erro ao obter o conteúdo da URL.');
-//             }
-//             const html = response.data;
-//             const $ = cheerio.load(html);
-//             ogData = {
-//                 ogTitle: $('meta[property="og:title"]').attr('content'),
-//                 ogDescription: $('meta[property="og:description"]').attr('content'),
-//                 ogImage: $('meta[property="og:image"]').attr('content'),
-//                 // Adicione outras tags OpenGraph que você precisa extrair
-//             };
-//         } catch (error) {
-//             console.error('Erro ao obter os dados do OpenGraph:', error.message);
-//         }
-//         attempt++;
-//         if (!ogData && attempt <= maxAttempts) {
-//             await new Promise((resolve) => setTimeout(resolve, delay));
-//         }
-//     }
-//     console.log(ogData);
-//     return ogData;
-// }
-// async function getProductInfo(id){
-//     const apiUrl = 'http://aliapi/api/product/' + id;
-//     //const apiUrl = 'http://127.0.0.1:8000/api/product/' + id;
-//     return new Promise((resolve, reject) => {
-//         axios.get(apiUrl)
-//         .then(function(response) {
-//             console.log("Resultado API: " + response.data);
-//             //console.log(response.status);
-//             //console.log(response.statusText);
-//             resolve(response.data);
-//         })
-//         .catch(function(error) {
-//             //console.error(error);
-//             reject(error);
-//         });
-//     });
-// }
-
-
-function replyMsg(message, productId, data) {
-  var productMessage;
-  return regeneratorRuntime.async(function replyMsg$(_context6) {
-    while (1) {
-      switch (_context6.prev = _context6.next) {
-        case 0:
-          //const data = await getShotUrl(productId);
           console.log(data);
 
           if (!(data && data.erro)) {
-            _context6.next = 6;
+            _context4.next = 6;
             break;
           }
 
           message.reply('O produto não tem suporte a link de afiliado, use o link original: https://pt.aliexpress.com/item/' + productId + '.html');
-          return _context6.abrupt("return");
+          return _context4.abrupt("return");
 
         case 6:
           console.log('URL Reduzida: ' + data.link);
@@ -434,10 +177,123 @@ function replyMsg(message, productId, data) {
 
         case 10:
         case "end":
-          return _context6.stop();
+          return _context4.stop();
       }
     }
   });
+}
+
+function getProductId(url) {
+  var finalUrl, newUrl, productPath, regex, match, productId, res, productUrl, _productPath, _regex, _match, _productId;
+
+  return regeneratorRuntime.async(function getProductId$(_context5) {
+    while (1) {
+      switch (_context5.prev = _context5.next) {
+        case 0:
+          console.log('URL recebida para obter ID: ' + url);
+          finalUrl = '';
+
+          if (!url.includes('/item/')) {
+            _context5.next = 13;
+            break;
+          }
+
+          console.log('Url não reduzida identificada, capturando id...');
+          newUrl = new URL(url);
+          productPath = newUrl.pathname;
+          regex = /\/item\/(\d+)\.html/;
+          match = productPath.match(regex);
+          productId = match[1];
+          console.log('ID do produto: ' + productId);
+          return _context5.abrupt("return", productId);
+
+        case 13:
+          console.log('URL reduzida identificada, tentando descobrir URL original...');
+          finalUrl = url;
+          _context5.prev = 15;
+          _context5.next = 18;
+          return regeneratorRuntime.awrap(fetch(finalUrl, {
+            redirect: 'follow',
+            method: 'GET'
+          }));
+
+        case 18:
+          res = _context5.sent;
+          console.log('URL final identificada: ' + res.url);
+          productUrl = new URL(res.url);
+          _productPath = productUrl.pathname;
+          console.log('Parte 1: ' + _productPath);
+          _regex = /\/item\/(\d+)\.html/;
+          _match = _productPath.match(_regex);
+          _productId = _match[1];
+          console.log('ID do produto: ' + _productId);
+          return _context5.abrupt("return", _productId);
+
+        case 30:
+          _context5.prev = 30;
+          _context5.t0 = _context5["catch"](15);
+          console.log(_context5.t0);
+
+        case 33:
+        case "end":
+          return _context5.stop();
+      }
+    }
+  }, null, null, [[15, 30]]);
+}
+
+function getShortUrl(id) {
+  var apiUrl, response, data;
+  return regeneratorRuntime.async(function getShortUrl$(_context6) {
+    while (1) {
+      switch (_context6.prev = _context6.next) {
+        case 0:
+          if (id == undefined) {
+            console.log('ID não definida!');
+          }
+
+          console.log('ID recebida para api: ' + id);
+          apiUrl = process.env.API_URL + id; //const apiUrl = 'http://aliapi/api/ali/' + id;
+
+          _context6.prev = 3;
+          _context6.next = 6;
+          return regeneratorRuntime.awrap(axios.get(apiUrl));
+
+        case 6:
+          response = _context6.sent;
+          data = '';
+
+          if (response.data.erro) {
+            //console.log('O produto não suporta link de afiliado :(')
+            data = {
+              erro: "O produto não suporta link de afiliado :("
+            };
+          } else {
+            data = {
+              title: response.data.title,
+              link: response.data.link,
+              price: response.data.price,
+              image: response.data.image,
+              discount: response.data.discount,
+              category1: response.data.category1,
+              category2: response.data.category2
+            };
+          }
+
+          console.log(data);
+          return _context6.abrupt("return", data);
+
+        case 13:
+          _context6.prev = 13;
+          _context6.t0 = _context6["catch"](3);
+          console.log(_context6.t0);
+
+        case 16:
+        case "end":
+          return _context6.stop();
+      }
+    }
+  }, null, null, [[3, 13]]);
 }
 
 function sendToTelegram(data) {

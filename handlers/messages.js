@@ -29,8 +29,13 @@ module.exports = (client) => {
                 const url = match.input;
                 try {
                     (async function(){                        
-                        let id = await getProductId(url)
-                        let data = await getShotUrl(id)
+                        const id = await new Promise((resolve, reject) => {
+                            getProductId(url)
+                                .then((id) => resolve(id))
+                                .catch((err) => reject(err));
+                        });
+                    
+                        const data = await getShotUrl(id)
                         await replyMsg(message, id, data)
                     })();
                     //const productId = await getProductId(url)

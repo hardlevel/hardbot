@@ -29,7 +29,9 @@ module.exports = (client) => {
                 const url = match.input;
                 try {
                     (async function(){                        
-                        await replyMsg(message, await getProductId(url), await getShotUrl(id))
+                        let id = await getProductId(url)
+                        let data = await getShotUrl(id)
+                        await replyMsg(message, id, data)
                     })();
                     //const productId = await getProductId(url)
                     //console.log('Meta: ' + metaData.image)                    

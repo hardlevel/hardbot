@@ -28,9 +28,13 @@ module.exports = (client) => {
                 //console.log(match.input)
                 const url = match.input;
                 try {
-                    const productId = await getProductId(url)
-                    //console.log('Meta: ' + metaData.image)
-                    await replyMsg(message, productId)                    
+                    (async function(){                        
+                        let id = await getProductId(url)
+                        let data = await getShotUrl(id)
+                        //await replyMsg(message, id, data)
+                    })();
+                    //const productId = await getProductId(url)
+                    //console.log('Meta: ' + metaData.image)                    
                 } catch (err) {
                     console.log(err)
                 }  
@@ -61,6 +65,7 @@ async function getProductId(url) {
     console.log('URL recebida para obter ID: ' + url)
     let finalUrl = ''
     if (url.includes('/item/')){
+        console.log('Url não reduzida identificada, capturando id...')
         const newUrl = new URL(url)
         const productPath = newUrl.pathname
         const regex = /\/item\/(\d+)\.html/
@@ -69,21 +74,29 @@ async function getProductId(url) {
         console.log('ID do produto: ' + productId)
         return productId
     } else {
+        console.log('URL reduzida identificada, tentando descobrir URL original...')
         finalUrl = url
         try{
-            const response = await axios.get(finalUrl)
-            const productUrl = new URL(response.request.res.responseUrl)
-            // if (productUrl.includes('https://aliexpress.ru')){u
-            //     productUrl = productUrl.replace('https://aliexpress.ru', 'https://pt.aliexpress.com')
-            // }
-            const productPath = productUrl.pathname
-            console.log(productPath)
-            console.log(productUrl)
-            const regex = /\/item\/(\d+)\.html/
-            const match = productPath.match(regex);
-            const productId = match[1]
-            console.log('ID do produto: ' + productId)
-            return productId
+            //metodo antigo com axios
+            //const response = await axios.get(finalUrl)
+            //
+            //metodo novo com node fetch, precisa atualizad o node
+            fetch(finalUrl,{redirect: 'follow', method: 'GET'})
+                .then(function(res) {
+                    console.log('URL final identificada: ' + res.url)
+                    const productUrl = new URL(res.url)
+                    const productPath = productUrl.pathname
+                    console.log('Parte 1: ' + productPath)
+                    //console.log(productUrl)
+                    const regex = /\/item\/(\d+)\.html/
+                    const match = productPath.match(regex);
+                    const productId = match[1]
+                    console.log('ID do produto: ' + productId)
+                    return productId
+                })
+                .catch(function(err) {
+                    console.log(err)
+                });
         } catch(err) {
             console.log(err)
         }
@@ -91,6 +104,7 @@ async function getProductId(url) {
 }
 
 async function getShotUrl(id) {
+    if (id == undefined){console.log('ID não definida!')}
     console.log('ID recebida para api: ' + id);
     const apiUrl = process.env.API_URL + id;
     //const apiUrl = 'http://aliapi/api/ali/' + id;
@@ -111,7 +125,7 @@ async function getShotUrl(id) {
                 category2: response.data.category2
             };
         }
-
+        console.log(data)
         return data;
     } catch (error) {
         console.log(error);
@@ -290,15 +304,15 @@ async function getShotUrl(id) {
 //     });
 // }
 
-async function replyMsg(message, productId, shortUrl, metaData){
-    const data = await getShotUrl(productId);
-
+async function replyMsg(message, productId, data){
+    //const data = await getShotUrl(productId);
+    console.log(data)
     if (data && data.erro) {
         message.reply('O produto não tem suporte a link de afiliado, use o link original: https://pt.aliexpress.com/item/' + productId + '.html')
         return
     } else {
         console.log('URL Reduzida: ' + data.link)
-        console.log(metaData)
+        console.log(data)
         const productMessage = new EmbedBuilder()
             .setColor(0x0099FF)
             .setTitle(data.title)
@@ -316,7 +330,7 @@ async function replyMsg(message, productId, shortUrl, metaData){
             .setFooter({ text: 'Aproveite esta oferta incrível!', iconURL: data.image });    
         message.reply({embeds: [productMessage]})
             .then(msg => setTimeout(() => message.delete(), 3000))
-            .then(sendToTelegram(data))
+            //.then(sendToTelegram(data))
     }
 }
 

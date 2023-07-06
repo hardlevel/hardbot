@@ -54,7 +54,13 @@ module.exports = function (client) {
                         switch (_context.prev = _context.next) {
                           case 0:
                             _context.next = 2;
-                            return regeneratorRuntime.awrap(getProductId(url));
+                            return regeneratorRuntime.awrap(new Promise(function (resolve, reject) {
+                              getProductId(url).then(function (id) {
+                                return resolve(id);
+                              })["catch"](function (err) {
+                                return reject(err);
+                              });
+                            }));
 
                           case 2:
                             id = _context.sent;

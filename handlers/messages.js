@@ -29,9 +29,7 @@ module.exports = (client) => {
                 const url = match.input;
                 try {
                     (async function(){                        
-                        let id = await getProductId(url)
-                        let data = await getShotUrl(id)
-                        //await replyMsg(message, id, data)
+                        await replyMsg(message, await getProductId(url), await getShotUrl(id))
                     })();
                     //const productId = await getProductId(url)
                     //console.log('Meta: ' + metaData.image)                    
@@ -330,7 +328,7 @@ async function replyMsg(message, productId, data){
             .setFooter({ text: 'Aproveite esta oferta incrível!', iconURL: data.image });    
         message.reply({embeds: [productMessage]})
             .then(msg => setTimeout(() => message.delete(), 3000))
-            //.then(sendToTelegram(data))
+            .then(sendToTelegram(data))
     }
 }
 

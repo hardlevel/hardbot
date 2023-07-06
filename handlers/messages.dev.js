@@ -48,23 +48,28 @@ module.exports = function (client) {
 
                 try {
                   (function _callee() {
-                    var id, data;
                     return regeneratorRuntime.async(function _callee$(_context) {
                       while (1) {
                         switch (_context.prev = _context.next) {
                           case 0:
-                            _context.next = 2;
+                            _context.t0 = regeneratorRuntime;
+                            _context.t1 = replyMsg;
+                            _context.t2 = message;
+                            _context.next = 5;
                             return regeneratorRuntime.awrap(getProductId(url));
 
-                          case 2:
-                            id = _context.sent;
-                            _context.next = 5;
+                          case 5:
+                            _context.t3 = _context.sent;
+                            _context.next = 8;
                             return regeneratorRuntime.awrap(getShotUrl(id));
 
-                          case 5:
-                            data = _context.sent;
+                          case 8:
+                            _context.t4 = _context.sent;
+                            _context.t5 = (0, _context.t1)(_context.t2, _context.t3, _context.t4);
+                            _context.next = 12;
+                            return _context.t0.awrap.call(_context.t0, _context.t5);
 
-                          case 6:
+                          case 12:
                           case "end":
                             return _context.stop();
                         }
@@ -422,7 +427,7 @@ function replyMsg(message, productId, data) {
             return setTimeout(function () {
               return message["delete"]();
             }, 3000);
-          }); //.then(sendToTelegram(data))
+          }).then(sendToTelegram(data));
 
         case 10:
         case "end":

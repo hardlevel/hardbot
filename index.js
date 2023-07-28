@@ -116,17 +116,3 @@ client.on('interactionCreate', async interaction => {
 		await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
 	}
 });
-
-
-//EAAKOPZAZBy5Y8BO6tfQ3NTADxVQO7RTssvtuzDfgCKB3bOGt4GQHE0eilK0gbOmy3YCEKWBVr68dn9UzLaWjmr9LqqyKoyuxUFhoKZCnxruVErhNcfTvEn4OSG8Wmq1HM2ZA6sOqrkMSu0HNapVNV3ZAj6iDDKUhhuQR6CuIHIqkr3HcSJ0ByZCEKphEZAqfFZBXFm0I733YspqdBfPSdIYCn258L9khRO9s5XmDfT03118ZD
-const Facebook = require('facebook-node-sdk');
-
-const facebook = new Facebook({ appId: '719345276872079', secret: '79090a7803aae95be19192f5e7db5127' });
-console.log(facebook)
-facebook.api(`/PAGE_ID/feed`, 'post', { message: 'Hello, world!' }, function(res) {
-  if(!res || res.error) {
-    console.log(!res ? 'error occurred' : res.error);
-    return;
-  }
-  console.log('Post Id: ' + res.id);
-});

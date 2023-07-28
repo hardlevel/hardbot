@@ -9,7 +9,6 @@
     "express": "^4.18.2",
     "got": "^13.0.0",
     "node-cron": "^3.0.2",
-    "open-graph-scraper": "^6.2.1",
     "paapi5-nodejs-sdk": "^1.1.0",
     "telegraf": "^4.12.2",
     "url-regex": "^5.0.0"

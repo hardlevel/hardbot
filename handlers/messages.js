@@ -5,8 +5,6 @@ const { MessageManager, EmbedBuilder } = require('discord.js')
 const axios = require('axios');
 const { urlencoded } = require('express');
 const fetch = require('node-fetch');
-const cheerio = require('cheerio');
-
 
 module.exports = (client) => {
     client.on('messageCreate', async message => {

@@ -19,8 +19,6 @@ var _require3 = require('express'),
 
 var fetch = require('node-fetch');
 
-var cheerio = require('cheerio');
-
 module.exports = function (client) {
   client.on('messageCreate', function _callee2(message) {
     var author, content, channel, regex, match, url;

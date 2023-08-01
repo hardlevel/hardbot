@@ -3,6 +3,7 @@
 const cron = require('node-cron');
 const { Guilds, ChannelManager } = require('discord.js')
 const { generalChatId, ps2OnlineId, serverId, memesId } = require('../config.json')
+const axios = require('axios')
 
 module.exports = async (client) => {
     const guild = client.guilds.cache.get(serverId)
@@ -97,13 +98,16 @@ module.exports = async (client) => {
     cron.schedule('0 8 * * *', () => {
         console.log('hora da gif!')
         // Use uma API de gifs para obter uma gif de bom dia (neste exemplo, usamos a API do Giphy)
-        fetch(`https://api.giphy.com/v1/gifs/random?api_key=${process.env.GIPHY_KEY}&tag=bom%20dia&rating=g&lang=pt`)
-        .then(res => res.json())
-        .then(data => {
-            console.log('retorno da api ', data)
+        //fetch(`https://api.giphy.com/v1/gifs/random?api_key=${process.env.GIPHY_KEY}&tag=bom%20dia&rating=g&lang=pt`)
+        //.then(res => res.json())
+        //.then(data => {
+        axios.get('https://g.tenor.com/v1/random?q=bom%20dia&key=LIVDSRZULELA&limit=1&locale=pt_BR')
+        .then((response) => {
+            console.log('retorno da api ', response.data)
+            const data = response.data
             // Verifique se a resposta da API é válida
-            if (data && data.data && data.data.images && data.data.images.original && data.data.images.original.url) {
-                const gifUrl = data.data.images.original.url;
+            if (data && data.results[0].url) {
+                const gifUrl = data.results[0].url
                 console.log('ta na hora da gif ', gifUrl)
                 async function sendGifToChannel(generalChatId){
                     const channel = await client.channels.fetch(generalChatId);
@@ -147,6 +151,8 @@ module.exports = async (client) => {
             })
     }
 
+    //a função abaixo funciona, serve para forçar excluir mensagens mesmo que sejam mais antigas de 14 dias
+    //descomentar apenas caso seja necessário usa-la
     //console.log('limpando mensagens ', memesId)
     // async function forceBulkDelete(memesId){
     //     const channel = await client.channels.fetch(memesId);

@@ -6,7 +6,6 @@ module.exports = (client) => {
     client.once('ready', async() => {            
         console.log(`Ready! Logged in as ${client.user.tag}`);
         //const rulesChannel = client.channels.fetch(rulesChannelId)
-        let nextEvent = ''
         //console.log(client.channels.fetch('1019672275571724349'))
         //538756064783499265
         const guild = client.guilds.cache.get('538756064783499265')

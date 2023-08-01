@@ -7,7 +7,6 @@ const axios = require('axios')
 
 module.exports = async (client) => {
     const guild = client.guilds.cache.get(serverId)
-    console.log('carregado!', process.env.GIPHY_KEY)
     //0 0 * * 1
     //var job = cron.schedule('0 20 * * 2', () => {
     var job = cron.schedule('0 20 * * 2', () => {

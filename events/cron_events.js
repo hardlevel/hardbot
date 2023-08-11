@@ -49,13 +49,19 @@ module.exports = async (client) => {
             //console.log(event.url)
             const text = `Novo evento de PS2 online criado! Marque para não perder! ${event.url}`
             client.channels.cache.get(generalChatId).send(text)
-            client.user.setUsername('HardBot 2023');
+            client.channels.cache.get(ps2OnlineId).send(text)
         })
         console.log('evento criado')
     }, {
         scheduled: false
     });
     job.start()
+
+    cron.schedule('*/30 * * * *', () =>{
+        if(client.user.username != "HardBot"){
+            client.user.setUsername('HardBot');
+        }
+    })
 
     cron.schedule('0 0 * * 1', () => {
         async function bulkDelete(memesId){
@@ -86,8 +92,8 @@ module.exports = async (client) => {
                     year == today.getYear()
                 if (todayEvent == true) {
                     const text = `Hoje tem evento de PS2 Online! Marca ai! Começando ${hour}:${minutes} ${event.url}`
-                    client.channels.cache.get(generalChatId).send(text)
-                    client.channels.cache.get(ps2OnlineId).send(text)
+                    //client.channels.cache.get(generalChatId).send(text)
+                    //client.channels.cache.get(ps2OnlineId).send(text)
                     sendToTelegram(event.url)
                 }
             })
@@ -102,7 +108,7 @@ module.exports = async (client) => {
         //.then(data => {
         axios.get('https://g.tenor.com/v1/random?q=bom%20dia&key=LIVDSRZULELA&limit=1&locale=pt_BR')
         .then((response) => {
-            console.log('retorno da api ', response.data)
+            //console.log('retorno da api ', response.data)
             const data = response.data
             // Verifique se a resposta da API é válida
             if (data && data.results[0].url) {
@@ -138,16 +144,22 @@ module.exports = async (client) => {
     // })
 
     async function sendToTelegram(data) {
+        console.log('enviando para telegram...', data)
         const url = 'https://api.telegram.org/bot';
         const apiToken = process.env.TELEGRAM_TOKEN;
         const chat_id = process.env.TELEGRAM_CHAT
         const text = `Hoje tem partida de PS2 Online no nosso discord! Acompanhe: ${data}`
         //tg.telegram.sendMessage(chatId, text)
-        axios.post(`${url}${apiToken}/sendPhoto`,
+        fetch(`${url}${apiToken}/sendMessage`, {
+            method: 'POST',
+            body: JSON.stringify({chat_id, text}),
+            headers: { 'Content-Type': 'application/json' }
+        }).then(response => response.json()).catch(error => error)
+        /*axios.post(`${url}${apiToken}/sendPhoto`,
             {
                 chat_id,
                 text
-            })
+            })*/
     }
 
     //a função abaixo funciona, serve para forçar excluir mensagens mesmo que sejam mais antigas de 14 dias

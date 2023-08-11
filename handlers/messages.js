@@ -25,18 +25,32 @@ module.exports = (client) => {
             if (match) {
                 //console.log(match.input)
                 const url = match.input;
-                (async function () {
-                    try {
+                console.log('link do aliexpress encontrado! ', url);
+                (async function (){
+                    console.log('url na função ', url);
+                    //{
                         //getProductId(url)
                         //getShotUrl(productId)
                         //replyMsg(message, productId, data)
-                            const productId = await getProductId(url)
-                            const data = await getShortUrl(productId)
-                            await replyMsg(message, productId, data )
+                            const productId = await getProductId(url);
+                            const data = await getShortUrl(productId);
+                            await replyMsg(message, productId, data);
                             //const productId = await getProductId(url)
                             //console.log('Meta: ' + metaData.image)                    
-                        } catch (err) {
-                            console.log(err)
+                    //    } catch (err) {
+                    //        console.log(err)
+                    //}
+                })()
+            } else {
+                (async function(){
+                    const searchTerm = /(https?:\/\/(?:www\.)?(?:amazon\.com(?:\.br)?|amzn\.[a-z]+)\/\S+)/i;
+                    if (content.includes('amazon') || content.includes('amzn')) {
+                        const urlMatches = content.match(searchTerm);
+                        if (urlMatches && urlMatches.length > 0) {
+                            const url = urlMatches[0];
+                            console.log('link da amazon encontrado! ', url)
+                            getAmazonId(url, message)
+                        }
                     }
                 })()
             }
@@ -63,13 +77,13 @@ module.exports = (client) => {
 }
 
 async function replyMsg(message, productId, data) {
-    console.log(data)
+    //console.log(message, productId, data)
     if (data && data.erro) {
         message.reply('O produto não tem suporte a link de afiliado, use o link original: https://pt.aliexpress.com/item/' + productId + '.html')
         return
     } else {
         console.log('URL Reduzida: ' + data.link)
-        console.log(data)
+        //console.log(data)
         const productMessage = new EmbedBuilder()
             .setColor(0x0099FF)
             .setTitle(data.title)
@@ -79,8 +93,8 @@ async function replyMsg(message, productId, data) {
             .setThumbnail(data.image)
             .addFields(
                 { name: 'Preço', value: data.price, inline: true },
-                { name: 'Categoria primária', value: data.category1, inline: true },
-                { name: 'Categoria secundária', value: data.category2, inline: true, inline: true },
+                { name: 'Categoria primária', value: data.category1 ? data.category1 : 'Games', inline: true },
+                { name: 'Categoria secundária', value: data.category2 ? data.category2 : 'Games', inline: true, inline: true },
             )
             .setImage(data.image)
             .setTimestamp()
@@ -89,6 +103,35 @@ async function replyMsg(message, productId, data) {
             .then(msg => setTimeout(() => message.delete(), 3000))
             .then(sendToTelegram(data))
     }
+}
+
+async function getAmazonId(url, message){
+    fetch(url, { redirect: 'follow', method: 'GET' }).then(response => {
+        let url = new URL(response.url)
+        //let path = url.pathname
+        let params = url.searchParams
+        let id = params.get('pd_rd_i')
+        console.log(id)
+        getAmazonProduct(id, message)
+    }).catch(error => console.log(error))
+}
+
+async function getAmazonProduct(id, message){
+    //console.log(id, message)
+    const apiUrl = process.env.API_URL + 'amz/' + id;
+    //fetch(apiUrl).then(response => console.log(response.text()))
+    axios.get(apiUrl)
+        .then(response => {
+            //console.log(response.data)
+            data = {
+                title: response.data.title,
+                link: response.data.link,
+                price: response.data.price,
+                image: response.data.image
+            };
+            replyMsg(message, id, data)
+        })
+        .catch(err => console.log(err))
 }
 
 async function getProductId(url) {
@@ -127,7 +170,7 @@ async function getProductId(url) {
 async function getShortUrl(id) {
     if (id == undefined) { console.log('ID não definida!') }
     console.log('ID recebida para api: ' + id);
-    const apiUrl = process.env.API_URL + id;
+    const apiUrl = process.env.API_URL + 'ali/' + id;
     //const apiUrl = 'http://aliapi/api/ali/' + id;
     try {
         const response = await axios.get(apiUrl);
@@ -136,6 +179,7 @@ async function getShortUrl(id) {
             //console.log('O produto não suporta link de afiliado :(')
             data = { erro: "O produto não suporta link de afiliado :(" }
         } else {
+            console.log(response.data)
             data = {
                 title: response.data.title,
                 link: response.data.link,
@@ -149,7 +193,7 @@ async function getShortUrl(id) {
         console.log(data)
         return data;
     } catch (error) {
-        console.log(error);
+        console.log(error.response.data);
     }
 }
 

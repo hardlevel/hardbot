@@ -8,13 +8,39 @@ const fetch = require('node-fetch');
 
 module.exports = (client) => {
     client.on('messageCreate', async message => {
-        //console.log(message)
+        console.log(message)
         const author = message.author
         const content = message.content
         const channel = client.channels.cache.get(message.channelId);
-        console.log(author.username + ' - ' + channel.name + ' - ' + content)
+        const perguntaTxt = `pergunta: substantivo feminino
+            palavra ou frase com que se faz uma interrogação.
+            questão que se submete a alguém de quem se espera que a resolva.
+            "as p. do vestibular foram muito difíceis"`
+        if (content.includes('pergunta') && (content.includes('duvida') || content.includes('dúvida'))){
+            message.reply(`De acordo com o dicionário, a definição de pergunta:\n\n${perguntaTxt}\n\nPor gentileza, não meta o louco`)
+        }
+        const terms = [
+            'tenho duvida', 
+            'tenho dúvida', 
+            'tenho uma dúvida', 
+            'tenho uma duvida', 
+            'tirar dúvida', 
+            'tirar duvida',
+            'tira duvida',
+            'tira dúvida',
+        ]
+        if (message.channelId == '538756978420219905'){
+            if(terms.some(term => content.includes(term))){
+                message.reply("Não use esse chat para tiruar duvidas de tutoriais ou solucionar problemas! Use as salas apropriadas para cada assunto! leia as <#538757121538392075>")
+            }
+            if(content.includes("sou novo")){
+                message.reply("Seja bem vindo ao nosso server, por favor certifique-se de ter lido atentamente as <#538757121538392075>, respeite o tema de cada sala")
+            }
+        }
+        //console.log(author.username + ' - ' + channel.name + ' - ' + content)
         if (author != '1063528592648192011') {
-            console.log('mensagem não é do bot')
+
+            //console.log('mensagem não é do bot')
             //const regex = /https?:\/\/.*?aliexpress\.com\/item\/(\d+)\.html/i;
             //const regex = /https?:\/\/(?:.*?\.?aliexpress\.com\/(?:[^\/]+\/)?(?:[^\/]+\/)?(?:item\/)?([\w-]+)(?:\.html)?|(?:[^\/]+\.)?(?:[a-z]+\.)?aliexpress\.com\/(?:e|item)\/([\w-]+))/i;
             //const regex = /((http|ftp|https):\/\/)?(([\w.-]*)\.([\w]*))/i

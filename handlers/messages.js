@@ -1,14 +1,14 @@
 const { client } = require('../index')
 const alertForum = "Seu post em nosso forum não pode ser aprovado pois o título possui palavras não permitidas ou é curto demais, por favor leia as regras com atenção antes de enviar mensagens no server. \n Mensagens com titulos extremamente vagos que não detalham o problema não serão aprovados!"
 const filter = ['ajuda', 'ajude', 'me ajuda', 'socorro', 'urgente']
-const { MessageManager, EmbedBuilder } = require('discord.js')
+const { MessageManager, EmbedBuilder, GuildMember, GuildMemberManager } = require('discord.js')
 const axios = require('axios');
 const { urlencoded } = require('express');
 const fetch = require('node-fetch');
 
 module.exports = (client) => {
     client.on('messageCreate', async message => {
-        console.log(message)
+        //console.log(message)
         const author = message.author
         const content = message.content
         const channel = client.channels.cache.get(message.channelId);
@@ -16,69 +16,84 @@ module.exports = (client) => {
             palavra ou frase com que se faz uma interrogação.
             questão que se submete a alguém de quem se espera que a resolva.
             "as p. do vestibular foram muito difíceis"`
-        if (content.includes('pergunta') && (content.includes('duvida') || content.includes('dúvida'))){
-            message.reply(`De acordo com o dicionário, a definição de pergunta:\n\n${perguntaTxt}\n\nPor gentileza, não meta o louco`)
-        }
-        const terms = [
-            'tenho duvida', 
-            'tenho dúvida', 
-            'tenho uma dúvida', 
-            'tenho uma duvida', 
-            'tirar dúvida', 
-            'tirar duvida',
-            'tira duvida',
-            'tira dúvida',
-        ]
-        if (message.channelId == '538756978420219905'){
-            if(terms.some(term => content.includes(term))){
-                message.reply("Não use esse chat para tiruar duvidas de tutoriais ou solucionar problemas! Use as salas apropriadas para cada assunto! leia as <#538757121538392075>")
+        if (author == true){
+            //console.log('é mensagem de um bot')
+            return;
+        } else {
+            //console.log('não é mensagem de bot')
+            //console.log(author)
+            if (content.includes('pergunta') && (content.includes('duvida') || content.includes('dúvida'))){
+                message.reply(`De acordo com o dicionário, a definição de pergunta:\n\n${perguntaTxt}\n\nPor gentileza, não meta o louco`)
             }
-            if(content.includes("sou novo")){
-                message.reply("Seja bem vindo ao nosso server, por favor certifique-se de ter lido atentamente as <#538757121538392075>, respeite o tema de cada sala")
+            //console.log(message.member.roles.cache.has('1143207357862645830'))
+            if (message.member.roles.cache.has('1143207357862645830')){
+                //console.log('primeira mensagem')
+                message.member.roles.remove('1143207357862645830')
+                if (content.includes('?')){
+                    message.reply('Essa é sua primeira mensagem no server, mas parece que aceitou as regras sem ler, se atente ao nome dessa sala e leia novamente as <#538757121538392075> e evite problemas!')
+                }
             }
-        }
-        //console.log(author.username + ' - ' + channel.name + ' - ' + content)
-        if (author != '1063528592648192011') {
+            const terms = [
+                'tenho duvida', 
+                'tenho dúvida', 
+                'tenho uma dúvida', 
+                'tenho uma duvida', 
+                'tirar dúvida', 
+                'tirar duvida',
+                'tira duvida',
+                'tira dúvida',
+            ]
+            if (message.channelId == '538756978420219905'){
+                if(terms.some(term => content.includes(term))){
+                    message.reply("Não use esse chat para tiruar duvidas de tutoriais ou solucionar problemas! Use as salas apropriadas para cada assunto! leia as <#538757121538392075>")
+                }
+                if(content.includes("sou novo")){
+                    message.reply("Seja bem vindo ao nosso server, por favor certifique-se de ter lido atentamente as <#538757121538392075>, respeite o tema de cada sala")
+                }
+            }
+            //console.log(author.username + ' - ' + channel.name + ' - ' + content)
+            if (author != '1063528592648192011') {
 
-            //console.log('mensagem não é do bot')
-            //const regex = /https?:\/\/.*?aliexpress\.com\/item\/(\d+)\.html/i;
-            //const regex = /https?:\/\/(?:.*?\.?aliexpress\.com\/(?:[^\/]+\/)?(?:[^\/]+\/)?(?:item\/)?([\w-]+)(?:\.html)?|(?:[^\/]+\.)?(?:[a-z]+\.)?aliexpress\.com\/(?:e|item)\/([\w-]+))/i;
-            //const regex = /((http|ftp|https):\/\/)?(([\w.-]*)\.([\w]*))/i
-            const regex = /((http|ftp|https):\/\/)?(([\w.-]*)\.aliexpress\.com([:\d]*)?)([\w.-\/]*)*/i;
+                //console.log('mensagem não é do bot')
+                //const regex = /https?:\/\/.*?aliexpress\.com\/item\/(\d+)\.html/i;
+                //const regex = /https?:\/\/(?:.*?\.?aliexpress\.com\/(?:[^\/]+\/)?(?:[^\/]+\/)?(?:item\/)?([\w-]+)(?:\.html)?|(?:[^\/]+\.)?(?:[a-z]+\.)?aliexpress\.com\/(?:e|item)\/([\w-]+))/i;
+                //const regex = /((http|ftp|https):\/\/)?(([\w.-]*)\.([\w]*))/i
+                const regex = /((http|ftp|https):\/\/)?(([\w.-]*)\.aliexpress\.com([:\d]*)?)([\w.-\/]*)*/i;
 
-            const match = content.match(regex);
+                const match = content.match(regex);
 
-            if (match) {
-                //console.log(match.input)
-                const url = match.input;
-                console.log('link do aliexpress encontrado! ', url);
-                (async function (){
-                    console.log('url na função ', url);
-                    //{
-                        //getProductId(url)
-                        //getShotUrl(productId)
-                        //replyMsg(message, productId, data)
-                            const productId = await getProductId(url);
-                            const data = await getShortUrl(productId);
-                            await replyMsg(message, productId, data);
-                            //const productId = await getProductId(url)
-                            //console.log('Meta: ' + metaData.image)                    
-                    //    } catch (err) {
-                    //        console.log(err)
-                    //}
-                })()
-            } else {
-                (async function(){
-                    const searchTerm = /(https?:\/\/(?:www\.)?(?:amazon\.com(?:\.br)?|amzn\.[a-z]+)\/\S+)/i;
-                    if (content.includes('amazon') || content.includes('amzn')) {
-                        const urlMatches = content.match(searchTerm);
-                        if (urlMatches && urlMatches.length > 0) {
-                            const url = urlMatches[0];
-                            console.log('link da amazon encontrado! ', url)
-                            getAmazonId(url, message)
+                if (match) {
+                    //console.log(match.input)
+                    const url = match.input;
+                    console.log('link do aliexpress encontrado! ', url);
+                    (async function (){
+                        console.log('url na função ', url);
+                        //{
+                            //getProductId(url)
+                            //getShotUrl(productId)
+                            //replyMsg(message, productId, data)
+                                const productId = await getProductId(url);
+                                const data = await getShortUrl(productId);
+                                await replyMsg(message, productId, data);
+                                //const productId = await getProductId(url)
+                                //console.log('Meta: ' + metaData.image)                    
+                        //    } catch (err) {
+                        //        console.log(err)
+                        //}
+                    })()
+                } else {
+                    (async function(){
+                        const searchTerm = /(https?:\/\/(?:www\.)?(?:amazon\.com(?:\.br)?|amzn\.[a-z]+)\/\S+)/i;
+                        if (content.includes('amazon') || content.includes('amzn')) {
+                            const urlMatches = content.match(searchTerm);
+                            if (urlMatches && urlMatches.length > 0) {
+                                const url = urlMatches[0];
+                                console.log('link da amazon encontrado! ', url)
+                                getAmazonId(url, message)
+                            }
                         }
-                    }
-                })()
+                    })()
+                }
             }
         }
     });

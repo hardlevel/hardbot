@@ -64,14 +64,14 @@ module.exports = async (client) => {
     })
 
     cron.schedule('0 0 * * 1', () => {
+    //cron.schedule('* * * * *', () => {    
         async function bulkDelete(memesId){
             const channel = await client.channels.fetch(memesId);
             const messages = await channel.messages.fetch()
             channel.bulkDelete(messages).then(
                 channel.send('https://media.giphy.com/media/26gscNQHswYio5RBu/giphy-downsized-large.gif')
-            )
+            ).catch(error => console.log(error))
         }
-    
         bulkDelete(memesId)
     })
 

@@ -9,46 +9,58 @@ const fetch = require('node-fetch');
 module.exports = (client) => {
     client.on('messageCreate', async message => {
         //console.log(message)
-        const author = message.author
-        const content = message.content
+        const roles = ['538803451812118538', '538803569005166602', '594656987237711892', '758085659272675329'];
+        const oplRoom = '1145723573839867975';
+        const author = message.author;
+        const content = message.content;
         const channel = client.channels.cache.get(message.channelId);
         const perguntaTxt = `pergunta: substantivo feminino
             palavra ou frase com que se faz uma interrogação.
-            questão que se submete a alguém de quem se espera que a resolva.
-            "as p. do vestibular foram muito difíceis"`
+            questão que se submete a alguém de quem se espera que a resolva.`;
+        if(message.channelId == '1145723573839867975'){
+            const downloader = require('./downloader')()
+        }
         if (author == true){
             //console.log('é mensagem de um bot')
             return;
         } else {
             //console.log('não é mensagem de bot')
             //console.log(author)
-            if (content.includes('pergunta') && (content.includes('duvida') || content.includes('dúvida'))){
-                message.reply(`De acordo com o dicionário, a definição de pergunta:\n\n${perguntaTxt}\n\nPor gentileza, não meta o louco`)
+            const memberHasRole = () => {
+                roles.forEach(item => {
+                    member.roles.cache.some(role => role.id === item);
+                })
             }
-            //console.log(message.member.roles.cache.has('1143207357862645830'))
-            if (message.member.roles.cache.has('1143207357862645830')){
-                //console.log('primeira mensagem')
-                message.member.roles.remove('1143207357862645830')
-                if (content.includes('?')){
-                    message.reply('Essa é sua primeira mensagem no server, mas parece que aceitou as regras sem ler, se atente ao nome dessa sala e leia novamente as <#538757121538392075> e evite problemas!')
+            //console.log(memberHasRole);
+            if(memberHasRole){
+                if (content.includes('pergunta') && (content.includes('duvida') || content.includes('dúvida'))){
+                    message.reply(`De acordo com o dicionário, a definição de pergunta:\n\n${perguntaTxt}\n\nPor gentileza, não meta o louco`)
                 }
-            }
-            const terms = [
-                'tenho duvida', 
-                'tenho dúvida', 
-                'tenho uma dúvida', 
-                'tenho uma duvida', 
-                'tirar dúvida', 
-                'tirar duvida',
-                'tira duvida',
-                'tira dúvida',
-            ]
-            if (message.channelId == '538756978420219905'){
-                if(terms.some(term => content.includes(term))){
-                    message.reply("Não use esse chat para tiruar duvidas de tutoriais ou solucionar problemas! Use as salas apropriadas para cada assunto! leia as <#538757121538392075>")
+                //console.log(message.member.roles.cache.has('1143207357862645830'))
+                if (message.member.roles.cache.has('1143207357862645830')){
+                    //console.log('primeira mensagem')
+                    message.member.roles.remove('1143207357862645830')
+                    if (content.includes('?')){
+                        message.reply('Essa é sua primeira mensagem no server, mas parece que aceitou as regras sem ler, se atente ao nome dessa sala e leia novamente as <#538757121538392075> e evite problemas!')
+                    }
                 }
-                if(content.includes("sou novo")){
-                    message.reply("Seja bem vindo ao nosso server, por favor certifique-se de ter lido atentamente as <#538757121538392075>, respeite o tema de cada sala")
+                const terms = [
+                    'tenho duvida', 
+                    'tenho dúvida', 
+                    'tenho uma dúvida', 
+                    'tenho uma duvida', 
+                    'tirar dúvida', 
+                    'tirar duvida',
+                    'tira duvida',
+                    'tira dúvida',
+                ]
+                if (message.channelId == '538756978420219905'){
+                    if(terms.some(term => content.includes(term))){
+                        message.reply("Não use esse chat para tiruar duvidas de tutoriais ou solucionar problemas! Use as salas apropriadas para cada assunto! leia as <#538757121538392075>")
+                    }
+                    if(content.includes("sou novo")){
+                        message.reply("Seja bem vindo ao nosso server, por favor certifique-se de ter lido atentamente as <#538757121538392075>, respeite o tema de cada sala")
+                    }
                 }
             }
             //console.log(author.username + ' - ' + channel.name + ' - ' + content)

@@ -40,7 +40,8 @@ const fs = require('node:fs');
 const path = require('node:path');
 const util = require('util');
 const axios = require('axios')
-
+//const facebook = require('./functions/facebook')();
+//const telegramText = require('./functions/telegram_sendtext')();
 const messages = require('./handlers/messages')
 //const startBot = require('./modules/startBot')
 

@@ -9,7 +9,7 @@ module.exports = async (client) => {
     const guild = client.guilds.cache.get(serverId)
     //0 0 * * 1
     //var job = cron.schedule('0 20 * * 2', () => {
-    var job = cron.schedule('0 20 * * 2', () => {
+    cron.schedule('0 20 * * 2', () => {
         console.log('Inicio do cron')
         // Lógica para calcular a data das terças-feiras às 19h
         const hoje = new Date();
@@ -52,10 +52,7 @@ module.exports = async (client) => {
             client.channels.cache.get(ps2OnlineId).send(text)
         })
         console.log('evento criado')
-    }, {
-        scheduled: false
-    });
-    job.start()
+    })
 
     cron.schedule('*/30 * * * *', () =>{
         if(client.user.username != "HardBot"){
@@ -95,13 +92,14 @@ module.exports = async (client) => {
                     //client.channels.cache.get(generalChatId).send(text)
                     //client.channels.cache.get(ps2OnlineId).send(text)
                     sendToTelegram(event.url)
+                    sendToFacebook(event.url)
                 }
             })
         })
     })
 
     cron.schedule('0 8 * * *', () => {
-        console.log('hora da gif!')
+        //console.log('hora da gif!')
         // Use uma API de gifs para obter uma gif de bom dia (neste exemplo, usamos a API do Giphy)
         //fetch(`https://api.giphy.com/v1/gifs/random?api_key=${process.env.GIPHY_KEY}&tag=bom%20dia&rating=g&lang=pt`)
         //.then(res => res.json())
@@ -142,24 +140,40 @@ module.exports = async (client) => {
     //         //message.channel.bulkDelete(fetched).then(message => console.log('mensagem apagada ', message))
     //     }
     // })
+    async function sendToFacebook(url){
+        const facebook = require('../functions/facebook');
+        const message = `Hoje tem evento de PS2 Online com o pessoal do Discord! Marca ai para não perder!
+        Entre em nosso Discord: https://hdlvl.dev/s/discord
+        Nossas lives em: 
+        https://hdlvl.dev/s/hardlevelplays
+        https://twitch.tv/venaogames
 
-    async function sendToTelegram(data) {
-        console.log('enviando para telegram...', data)
-        const url = 'https://api.telegram.org/bot';
-        const apiToken = process.env.TELEGRAM_TOKEN;
-        const chat_id = process.env.TELEGRAM_CHAT
-        const text = `Hoje tem partida de PS2 Online no nosso discord! Acompanhe: ${data}`
-        //tg.telegram.sendMessage(chatId, text)
-        fetch(`${url}${apiToken}/sendMessage`, {
-            method: 'POST',
-            body: JSON.stringify({chat_id, text}),
-            headers: { 'Content-Type': 'application/json' }
-        }).then(response => response.json()).catch(error => error)
-        /*axios.post(`${url}${apiToken}/sendPhoto`,
-            {
-                chat_id,
-                text
-            })*/
+        Siga nas demais redes: https://linktr.ee/hardlevel
+        `
+        await facebook(message)
+    }
+
+    async function sendToTelegram(url) {
+        const telegram = require('../functions/telegram_sendtext')
+        const text = `Hoje tem partida de PS2 Online no nosso discord! Acompanhe: ${url}`
+        const message = {text};
+        await telegram(message);
+        // console.log('enviando para telegram...', data)
+        // const url = 'https://api.telegram.org/bot';
+        // const apiToken = process.env.TELEGRAM_TOKEN;
+        // const chat_id = process.env.TELEGRAM_CHAT
+        // const text = `Hoje tem partida de PS2 Online no nosso discord! Acompanhe: ${data}`
+        // //tg.telegram.sendMessage(chatId, text)
+        // fetch(`${url}${apiToken}/sendMessage`, {
+        //     method: 'POST',
+        //     body: JSON.stringify({chat_id, text}),
+        //     headers: { 'Content-Type': 'application/json' }
+        // }).then(response => response.json()).catch(error => error)
+        // /*axios.post(`${url}${apiToken}/sendPhoto`,
+        //     {
+        //         chat_id,
+        //         text
+        //     })*/
     }
 
     //a função abaixo funciona, serve para forçar excluir mensagens mesmo que sejam mais antigas de 14 dias

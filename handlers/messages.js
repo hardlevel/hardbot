@@ -134,11 +134,11 @@ module.exports = (client) => {
 async function replyMsg(message, productId, data) {
     //console.log(data);
     //console.log(message, productId, data)
-    if (data && data.erro) {
+    if (data && data.error) {
         message.reply('O produto não tem suporte a link de afiliado, use o link original: https://pt.aliexpress.com/item/' + productId + '.html')
         return
     } else {
-        console.log('URL Reduzida: ' + data.link)
+        //console.log('URL Reduzida: ' + data.link)
         //console.log(data)
         const productMessage = new EmbedBuilder()
             .setColor(0x0099FF)
@@ -203,14 +203,14 @@ async function getProductId(url) {
         //console.log('ID do produto: ' + productId)
         return productId
     } else {
-        console.log('URL reduzida identificada, tentando descobrir URL original...')
+        //console.log('URL reduzida identificada, tentando descobrir URL original...')
         finalUrl = url
         try {
             const res = await fetch(finalUrl, { redirect: 'follow', method: 'GET' });
             //console.log('URL final identificada: ' + res.url)
             const productUrl = new URL(res.url)
             const productPath = productUrl.pathname
-            console.log('Parte 1: ' + productPath)
+            //console.log('Parte 1: ' + productPath)
             const regex = /\/item\/(\d+)\.html/
             const match = productPath.match(regex);
             const productId = match[1]
@@ -225,18 +225,25 @@ async function getProductId(url) {
 }
 
 async function getShortUrl(id) {
+    //console.log('Obtendo informações de produto com ID: ', id);
     const ali = require('../functions/ali_api');
     const res = await(ali(id));
-    console.log(res.link);
-    let data = {
-        title: res.title,
-        link: res.link,
-        price: res.price,
-        image: res.image,
-        discount: res.discount,
-        category1: res.category1,
-        category2: res.category2
-    };
+    let data = {};
+    if(res.erro){
+        data.error = "Este produto não possui suporte a link afiliado, use o link original"
+    } else {
+        //console.log(await res.erro);
+        data = {
+            title: res.title,
+            link: res.link,
+            price: res.price,
+            image: res.image,
+            discount: res.discount,
+            category1: res.category1,
+            category2: res.category2
+        };
+    }
+    //console.log("Retorno do ali: ", data);
     return data;
 }
 

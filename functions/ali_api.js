@@ -14,6 +14,7 @@ module.exports = async (id) => {
 
     try {
         const response = await fetch(baseUrl, options)
+        //console.log(await response.json())
         return await response.json();
     } catch (error) {
         console.log(error);

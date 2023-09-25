@@ -9,8 +9,9 @@ module.exports = async (client) => {
     const guild = client.guilds.cache.get(serverId)
     //0 0 * * 1
     //var job = cron.schedule('0 20 * * 2', () => {
-    cron.schedule('0 20 * * 2', () => {
-        console.log('Inicio do cron')
+    cron.schedule('0 19 * * TUE', () => {
+    //cron.schedule('* * * * MON', () => {
+        console.log('Criando evento do delta!')
         // Lógica para calcular a data das terças-feiras às 19h
         const hoje = new Date();
         const proximaTerca = new Date(hoje);
@@ -142,10 +143,11 @@ module.exports = async (client) => {
     // })
     async function sendToFacebook(url){
         const facebook = require('../functions/facebook');
-        const message = `Hoje tem evento de PS2 Online com o pessoal do Discord! Marca ai para não perder!
+        const message = `
+        Hoje tem evento de PS2 Online com o pessoal do Discord! Marca ai para não perder!
         Entre em nosso Discord: https://hdlvl.dev/s/discord
         Nossas lives em: 
-        https://hdlvl.dev/s/hardlevelplays
+        https://hdlvl.dev/s/playmania
         https://twitch.tv/venaogames
 
         Siga nas demais redes: https://linktr.ee/hardlevel

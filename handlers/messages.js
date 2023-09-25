@@ -26,15 +26,15 @@ module.exports = (client) => {
         } else {
             //console.log('não é mensagem de bot')
             //console.log(author)
-            const memberHasRole = () => {
-                roles.forEach(item => {
-                    member.roles.cache.some(role => {
+            const memberHasRole = (member) => {                
+                roles.forEach(item => {                                    
+                    member.roles.cache.some(role => {                        
                         role.id === item
                     });
                 })
             }
             //console.log(memberHasRole);
-            if(memberHasRole){
+            if(!memberHasRole(message.member)){
                 if (content.includes('pergunta') && (content.includes('duvida') || content.includes('dúvida'))){
                     message.reply(`De acordo com o dicionário, a definição de pergunta:\n\n${perguntaTxt}\n\nPor gentileza, não meta o louco`)
                 }

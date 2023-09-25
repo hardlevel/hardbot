@@ -12,15 +12,15 @@ const { youtube } = require('../config.json');
 
 module.exports = async (term) => {
     const url = new URL("https://youtube.googleapis.com/youtube/v3/search?");
-
+    //console.log('termo recebido: ', term);
     const params = new URLSearchParams({
         maxResults: 3,
         part: "snippet",
-        q: "golpe",
+        q: term,
         channelId: "UCFUTYcj_6fwrw207-YAghLA",
         key: youtube
     });
-    console.log(params)
+    //console.log(params)
     //console.log(url + encodeURIComponent(params));
     const headers = {
         headers: {
@@ -28,5 +28,9 @@ module.exports = async (term) => {
         }
     };
     const response = await fetch(url + params, {headers});
-    console.log(await response.json());
+    //console.log(await response.json());
+    const videos = await response.json();
+    //let videos = 'ok';
+    //console.log(videos.items);
+    return videos.items;
 }

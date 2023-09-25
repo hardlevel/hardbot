@@ -61,12 +61,13 @@ module.exports = async (client) => {
         }
     })
 
-    cron.schedule('0 0 * * 1', () => {
+    cron.schedule('0 0 * * MON', () => {
     //cron.schedule('* * * * *', () => {    
         async function bulkDelete(memesId){
             const channel = await client.channels.fetch(memesId);
-            const messages = await channel.messages.fetch()
-            channel.bulkDelete(messages).then(
+            const messages = await channel.messages.fetch();
+            //console.log(messages.size, messages);
+            channel.bulkDelete(messages.size).then(
                 channel.send('https://media.giphy.com/media/26gscNQHswYio5RBu/giphy-downsized-large.gif')
             ).catch(error => console.log(error))
         }

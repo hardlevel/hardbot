@@ -17,10 +17,8 @@ jobs:
         USERNAME: ${{ secrets.USER }}
         PORT: ${{ secrets.PORT }}
         KEY: ${{ secrets.KEY }}
-      with:
         source: "."
         target: "/var/www/hardbot"
-
     - name: Executing remote command
       uses: appleboy/ssh-action@master
       with:

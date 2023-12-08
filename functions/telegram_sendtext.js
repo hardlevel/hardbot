@@ -3,7 +3,7 @@ const { telegram_chatId, telegram_token } = require('../config.json');
 //const querystring = require('node:querystring'); 
 
 module.exports = async (message) => {
-    const baseUrl = `https://api.telegram.org/bot${telegram_token}/sendPhoto`;
+    const baseUrl = `https://api.telegram.org/bot${telegram_token}/sendMessage`;
 
     message.chat_id = telegram_chatId;
     
@@ -17,8 +17,9 @@ module.exports = async (message) => {
     console.log(options);
 
     try {
-        const response = await fetch(baseUrl, options)
-        console.log(await response);
+        const response = await fetch(baseUrl, options);
+        const responseBody = await response.json();
+        console.log(responseBody);
         return response;
     } catch (error) {
         console.log(error);

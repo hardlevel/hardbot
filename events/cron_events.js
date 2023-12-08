@@ -9,6 +9,7 @@ module.exports = async (client) => {
     const guild = client.guilds.cache.get(serverId)
     //0 0 * * 1
     //var job = cron.schedule('0 20 * * 2', () => {
+    //cron.schedule('* * * * *', () => {
     cron.schedule('0 19 * * TUE', () => {
     //cron.schedule('* * * * MON', () => {
         console.log('Criando evento do delta!')
@@ -25,7 +26,7 @@ module.exports = async (client) => {
 
         // Chama sua função passando o parâmetro dataTercaISO8601
 
-        client.user.setUsername('ABOC');
+        //client.user.setUsername('ABOC');
         guild.scheduledEvents.create({
             name: 'Delta Force - Evento PS2 Online',
             scheduledStartTime: dataTercaISO8601,
@@ -33,19 +34,17 @@ module.exports = async (client) => {
             entityType: 2,
             channel: '591729371539046421',
             image: 'img/delta.webp',
-            description: `
-                Todas as terças às 19h teremos Delta Force Black Hawk Down Online!
+            description: `Todas as terças às 19h teremos Delta Force Black Hawk Down Online!\n\n`+
 
-                DNS:45.7.228.197
+                `DNS:45.7.228.197\n\n`+
 
-                GameID: Delta Force Black Hawk Down SLUS_211.24
-                ou
-                GamelD: Delta Force Black Hawk Down TEAM SABRE SLUS_214.14
+                `GameID: Delta Force Black Hawk Down SLUS_211.24\n`+
+                `ou\n`+
+                `GamelD: Delta Force Black Hawk Down TEAM SABRE SLUS_214.14\n\n`+
 
-                Max Players: 16 Players
+                `Max Players: 16 Players\n\n`+
 
-                LINK DA IS0 : https://drive.google.com/file/d/1PGVZy1E2EoVQFd5S-fYhJSNWybqjBnLR
-                `
+                `LINK DA IS0 : https://drive.google.com/file/d/1PGVZy1E2EoVQFd5S-fYhJSNWybqjBnLR`
         }).then(event => {
             //console.log(event.url)
             const text = `Novo evento de PS2 online criado! Marque para não perder! ${event.url}`
@@ -74,28 +73,33 @@ module.exports = async (client) => {
         bulkDelete(memesId)
     })
 
-    cron.schedule('0 17 * * *', () => {
+    cron.schedule('* * * * *', () => {
+    //cron.schedule('0 17 * * *', () => {
         const createdEvents = guild.scheduledEvents.fetch().then(events => {
-            events.forEach(event => {
-                const eventDate = event.scheduledStartAt
-                const today = new Date()
+            events.forEach(event => {                
+                //console.log(event);
+                const eventDate = event.scheduledStartAt;
+                const today = new Date();
                 //console.log(event.scheduledStartAt, new Date(), event.scheduledStartAt.getDay())
-                const day = eventDate.getDate()
-                const month = eventDate.getMonth()
-                const year = eventDate.getYear()
-                const hour = eventDate.getHours()
-                const minutes = eventDate.getMinutes()
+                const day = eventDate.getDate();
+                const month = eventDate.getMonth();
+                const year = eventDate.getYear();
+                const hour = eventDate.getHours();
+                //const minutes = eventDate.getMinutes(); String(eventDate.getMinutes()).padStart(2, "0");
+                const minutes = String(eventDate.getMinutes()).padStart(2, "0");
                 const todayEvent =
                     day == today.getDate() &&
                     month == today.getMonth() &&
                     year == today.getYear()
                 if (todayEvent == true) {
-                    const text = `Hoje tem evento de PS2 Online! Marca ai! Começando ${hour}:${minutes} ${event.url}`
+                    console.log('tem evento!')
+                    const text = `Hoje tem evento de PS2 Online! Marca ai! Começando ${hour}:${minutes}\n`+
+                        `Evento: ${event.name}`;
                     //client.channels.cache.get(generalChatId).send(text)
                     //client.channels.cache.get(ps2OnlineId).send(text)
-                    sendToTelegram(event.url)
-                    sendToFacebook(event.url)
-                }
+                    sendToTelegram(event.name, hour, minutes);
+                    sendToFacebook(event.name, hour, minutes);
+                } else {console.log('não tem evento!');}
             })
         })
     })
@@ -142,23 +146,39 @@ module.exports = async (client) => {
     //         //message.channel.bulkDelete(fetched).then(message => console.log('mensagem apagada ', message))
     //     }
     // })
-    async function sendToFacebook(url){
-        const facebook = require('../functions/facebook');
-        const message = `
-        Hoje tem evento de PS2 Online com o pessoal do Discord! Marca ai para não perder!
-        Entre em nosso Discord: https://hdlvl.dev/s/discord
-        Nossas lives em: 
-        https://hdlvl.dev/s/playmania
-        https://twitch.tv/venaogames
+    //cron.schedule('* * * * *', () => {
+    //    sendFacebookGroups('hello world!');
+    //});
 
-        Siga nas demais redes: https://linktr.ee/hardlevel
-        `
-        await facebook(message)
+    const sendFacebookGroups = async (message) => {
+        console.log('enviando para grupos');
+        const fb = require('../functions/fbgroups');
+        const response = await fb(message);
+        //const respondeBody = await response.json()        
     }
 
-    async function sendToTelegram(url) {
+    async function sendToFacebook(name, hour, minutes){
+        const facebook = require('../functions/facebook');
+        const message = `Hoje tem evento de PS2 Online com o pessoal do Discord! Maaca ai para não perder!\n`+
+        `Evento: ${name}\n`+
+        `Horário: ${hour}:${minutes}\n`+
+        `Entre em nosso Discord: https://hdlvl.dev/s/discord\n`+
+        `Nossas lives em:\n`+
+        `https://hdlvl.dev/s/playmania\n`+
+        `https://twitch.tv/venaogames\n\n`+
+
+        `Siga nas demais redes: https://linktr.ee/hardlevel`;
+        console.log('enviando para pagina');
+        await facebook(message);
+        await sendFacebookGroups(message);
+    }
+
+    async function sendToTelegram(name, hour, minutes) {
         const telegram = require('../functions/telegram_sendtext')
-        const text = `Hoje tem partida de PS2 Online no nosso discord! Acompanhe: ${url}`
+        const text = `Hoje tem partida de PS2 Online no nosso discord!\n`+
+                `Evento: ${name}\n`+
+                `Horário: ${hour}:${minutes}\n`+
+                `Acompanhe: https://hdlvl.dev/s/discord`;
         const message = {text};
         await telegram(message);
         // console.log('enviando para telegram...', data)

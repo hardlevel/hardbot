@@ -13,7 +13,7 @@ module.exports = (client) => {
         const ps2OnlineId = '735500041355264050'
         //0 0 * * 1
         //var job = cron.schedule('0 20 * * 2', () => {
-        var job = cron.schedule('* * * * *', () => {            
+        var job = cron.schedule('* * * * *', () => {
             console.log('Inicio do cron')
             // Lógica para calcular a data das terças-feiras às 19h
             const hoje = new Date();

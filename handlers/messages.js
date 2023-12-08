@@ -35,11 +35,13 @@ module.exports = (client) => {
             }
             //console.log(memberHasRole);
             if(!memberHasRole(message.member)){
-                if (content.includes('pergunta') && (content.includes('duvida') || content.includes('dúvida'))){
-                    message.reply(`De acordo com o dicionário, a definição de pergunta:\n\n${perguntaTxt}\n\nPor gentileza, não meta o louco`)
+                if (message.channelId == '538756978420219905'){
+                    if (content.includes('pergunta') && (content.includes('duvida') || content.includes('dúvida'))){
+                        message.reply(`De acordo com o dicionário, a definição de pergunta:\n\n${perguntaTxt}\n\nPor gentileza, não meta o louco`)
+                    }
                 }
                 //console.log(message.member.roles.cache.has('1143207357862645830'))
-                if (message.member.roles.cache.has('1143207357862645830')){
+                if (message.member.roles.cache.has('1143207357862645830') && message.channelId == '538756978420219905') {
                     //console.log('primeira mensagem')
                     message.member.roles.remove('1143207357862645830')
                     if (content.includes('?')){

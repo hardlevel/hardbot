@@ -32,4 +32,4 @@ jobs:
         script: |
           cd /var/www/hardbot
           pm2 stop hardbot
-          pm2 start hardbot
+          pm2 start index.js -f --name hardbot --watch

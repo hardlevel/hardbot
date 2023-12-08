@@ -31,4 +31,5 @@ jobs:
         password: ${{ secrets.PASS }}
         script: |
           cd /var/www/hardbot
+          pm2 stop hardbot
           pm2 start hardbot

@@ -113,17 +113,50 @@ module.exports = async (client) => {
         axios.get('https://g.tenor.com/v1/random?q=bom%20dia&key=LIVDSRZULELA&limit=1&locale=pt_BR')
         .then((response) => {
             //console.log('retorno da api ', response.data)
-            const data = response.data
+            const data = response.data;
             // Verifique se a resposta da API é válida
             if (data && data.results[0].url) {
-                const gifUrl = data.results[0].url
-                console.log('ta na hora da gif ', gifUrl)
+                const gifUrl = data.results[0].url;
+                console.log('ta na hora da gif ', gifUrl);
                 async function sendGifToChannel(generalChatId){
                     const channel = await client.channels.fetch(generalChatId);
-                    console.log(channel)
-                    channel.send(`Bom dia! flores do dia! ${gifUrl}`)
+                    // console.log(channel)
+                    channel.send(`Bom dia! flores do dia! ${gifUrl}`);
                 }
-                sendGifToChannel(generalChatId)
+                sendGifToChannel(generalChatId);
+                // Enviar a gif para o canal do Discord
+                //client.channels.cache.get(generalChatId).send(`Bom dia! flores do dia! ${gifUrl}`)
+                
+                // if (channel && channel.isText()) {
+                //     channel.send(`Bom dia! flores do dia! ${gifUrl}`);
+                // }
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao obter a gif de bom dia:', error);
+        });
+    });
+
+    cron.schedule('0 21 * * *', () => {
+        //console.log('hora da gif!')
+        // Use uma API de gifs para obter uma gif de bom dia (neste exemplo, usamos a API do Giphy)
+        //fetch(`https://api.giphy.com/v1/gifs/random?api_key=${process.env.GIPHY_KEY}&tag=bom%20dia&rating=g&lang=pt`)
+        //.then(res => res.json())
+        //.then(data => {
+        axios.get('https://g.tenor.com/v1/random?q=nicolas%20cage&key=LIVDSRZULELA&limit=1')
+        .then((response) => {
+            //console.log('retorno da api ', response.data)
+            const data = response.data;
+            // Verifique se a resposta da API é válida
+            if (data && data.results[0].url) {
+                const gifUrl = data.results[0].url;
+                console.log('ta na hora da gif ', gifUrl);
+                async function sendGifToChannel(generalChatId){
+                    const channel = await client.channels.fetch(generalChatId);
+                    // console.log(channel)
+                    channel.send(`Uma boa noite a todos! ${gifUrl}`);
+                }
+                sendGifToChannel(generalChatId);
                 // Enviar a gif para o canal do Discord
                 //client.channels.cache.get(generalChatId).send(`Bom dia! flores do dia! ${gifUrl}`)
                 
@@ -181,22 +214,6 @@ module.exports = async (client) => {
                 `Acompanhe: https://hdlvl.dev/s/discord`;
         const message = {text};
         await telegram(message);
-        // console.log('enviando para telegram...', data)
-        // const url = 'https://api.telegram.org/bot';
-        // const apiToken = process.env.TELEGRAM_TOKEN;
-        // const chat_id = process.env.TELEGRAM_CHAT
-        // const text = `Hoje tem partida de PS2 Online no nosso discord! Acompanhe: ${data}`
-        // //tg.telegram.sendMessage(chatId, text)
-        // fetch(`${url}${apiToken}/sendMessage`, {
-        //     method: 'POST',
-        //     body: JSON.stringify({chat_id, text}),
-        //     headers: { 'Content-Type': 'application/json' }
-        // }).then(response => response.json()).catch(error => error)
-        // /*axios.post(`${url}${apiToken}/sendPhoto`,
-        //     {
-        //         chat_id,
-        //         text
-        //     })*/
     }
 
     //a função abaixo funciona, serve para forçar excluir mensagens mesmo que sejam mais antigas de 14 dias

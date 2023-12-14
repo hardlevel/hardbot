@@ -2,7 +2,7 @@
 
 const cron = require('node-cron');
 const { Guilds, ChannelManager } = require('discord.js')
-const { generalChatId, ps2OnlineId, serverId, memesId } = require('../config.json')
+const { generalChatId, ps2OnlineId, serverId, memesId, ifttt_key } = require('../config.json')
 const axios = require('axios')
 
 module.exports = async (client) => {
@@ -76,7 +76,7 @@ module.exports = async (client) => {
     //cron.schedule('* * * * *', () => {
     cron.schedule('0 17 * * *', () => {
         const createdEvents = guild.scheduledEvents.fetch().then(events => {
-            events.forEach(event => {                
+            events.forEach(event => {
                 //console.log(event);
                 const eventDate = event.scheduledStartAt;
                 const today = new Date();
@@ -95,10 +95,11 @@ module.exports = async (client) => {
                     console.log('tem evento!')
                     const text = `Hoje tem evento de PS2 Online! Marca ai! Começando ${hour}:${minutes}\n`+
                         `Evento: ${event.name}`;
-                    //client.channels.cache.get(generalChatId).send(text)
-                    //client.channels.cache.get(ps2OnlineId).send(text)
+                    client.channels.cache.get(generalChatId).send(text)
+                    client.channels.cache.get(ps2OnlineId).send(text)
                     sendToTelegram(event.name, hour, minutes);
                     sendToFacebook(event.name, hour, minutes);
+                    sendToTwitter(event.name, hour, minutes, ifttt_key);
                 } else {console.log('não tem evento!');}
             })
         })
@@ -192,7 +193,7 @@ module.exports = async (client) => {
 
     async function sendToFacebook(name, hour, minutes){
         const facebook = require('../functions/facebook');
-        const message = `Hoje tem evento de PS2 Online com o pessoal do Discord! Maaca ai para não perder!\n`+
+        const message = `Hoje tem evento de PS2 Online com o pessoal do Discord! Marca ai para não perder!\n`+
         `Evento: ${name}\n`+
         `Horário: ${hour}:${minutes}\n`+
         `Entre em nosso Discord: https://hdlvl.dev/s/discord\n`+
@@ -214,6 +215,29 @@ module.exports = async (client) => {
                 `Acompanhe: https://hdlvl.dev/s/discord`;
         const message = {text};
         await telegram(message);
+    }
+
+    async function sendToTwitter(name, hour, minutes, ifttt_key){
+        console.log(ifttt_key, name, hour, minutes);
+        const url = `https://maker.ifttt.com/trigger/twitter_event/with/key/${ifttt_key}`;
+        const data = {
+            "value1": name,
+            "value2": `${hour}:${minutes}`
+        }
+        try {
+            const ifttt = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            });
+    
+            //const response = await ifttt.json();
+            //console.log(response);
+        } catch (error) {
+            console.error('Erro ao enviar para o IFTTT:', error);
+        }
     }
 
     //a função abaixo funciona, serve para forçar excluir mensagens mesmo que sejam mais antigas de 14 dias

@@ -44,13 +44,6 @@ const axios = require('axios')
 //const telegramText = require('./functions/telegram_sendtext')();
 //const youtube = require('./functions/youtube')("opl");
 const messages = require('./handlers/messages')
-
-
-// async function mobyInit(){
-//     console.log(moby);
-// }
-
-
 //const startBot = require('./modules/startBot')
 
 let rulesChannel = ''
@@ -89,7 +82,6 @@ client.once(Events.ClientReady, c => {
     //console.log(`Ready! Logged in as ${c.user.tag}`);
     messages(client)
     require('./events/cron_events.js')(client);
-    //console.log(moby.games[0].sample_cover.image);
     //console.log(client.commands)
     //console.log(client.application)
     //client.user.setUsername('HardBot 2023');

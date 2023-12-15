@@ -54,11 +54,11 @@ module.exports = async (client) => {
         console.log('evento criado')
     })
 
-    cron.schedule('*/30 * * * *', () =>{
-        if(client.user.username != "HardBot"){
-            client.user.setUsername('HardBot');
-        }
-    })
+    // cron.schedule('*/30 * * * *', () =>{
+    //     if(client.user.username != "HardBot"){
+    //         client.user.setUsername('HardBot');
+    //     }
+    // })
 
     cron.schedule('0 0 * * MON', () => {
     //cron.schedule('* * * * *', () => {    
@@ -73,14 +73,14 @@ module.exports = async (client) => {
         bulkDelete(memesId)
     })
 
-    //cron.schedule('* * * * *', () => {
-    cron.schedule('0 17 * * *', () => {
+    cron.schedule('* * * * *', () => {
+    //cron.schedule('0 17 * * *', () => {
         const createdEvents = guild.scheduledEvents.fetch().then(events => {
             events.forEach(event => {
-                //console.log(event);
+                const description = event.description;
+                const image = event.coverImageURL() || getCover(description, event);
                 const eventDate = event.scheduledStartAt;
                 const today = new Date();
-                //console.log(event.scheduledStartAt, new Date(), event.scheduledStartAt.getDay())
                 const day = eventDate.getDate();
                 const month = eventDate.getMonth();
                 const year = eventDate.getYear();
@@ -98,7 +98,7 @@ module.exports = async (client) => {
                     client.channels.cache.get(generalChatId).send(text)
                     client.channels.cache.get(ps2OnlineId).send(text)
                     sendToTelegram(event.name, hour, minutes);
-                    sendToFacebook(event.name, hour, minutes);
+                    sendToFacebook(event.name, hour, minutes, image);
                     sendToTwitter(event.name, hour, minutes, ifttt_key);
                 } else {console.log('não tem evento!');}
             })
@@ -188,10 +188,10 @@ module.exports = async (client) => {
         console.log('enviando para grupos');
         const fb = require('../functions/fbgroups');
         const response = await fb(message);
-        //const respondeBody = await response.json()        
+        //const respondeBody = await response.json()
     }
 
-    async function sendToFacebook(name, hour, minutes){
+    async function sendToFacebook(name, hour, minutes, image){
         const facebook = require('../functions/facebook');
         const message = `Hoje tem evento de PS2 Online com o pessoal do Discord! Marca ai para não perder!\n`+
         `Evento: ${name}\n`+
@@ -203,8 +203,8 @@ module.exports = async (client) => {
 
         `Siga nas demais redes: https://linktr.ee/hardlevel`;
         console.log('enviando para pagina');
-        await facebook(message);
-        await sendFacebookGroups(message);
+        const fbPost = await facebook(message, image);
+        await sendFacebookGroups(message, fbPost);
     }
 
     async function sendToTelegram(name, hour, minutes) {
@@ -238,6 +238,39 @@ module.exports = async (client) => {
         } catch (error) {
             console.error('Erro ao enviar para o IFTTT:', error);
         }
+    }
+
+    async function getCover(description, event) {
+        const padrao = /Game:\s*(.+)/;
+        const correspondencia = description.match(padrao);
+        let conteudo = '';
+        let img = '';
+        // Verifique se houve uma correspondência e obtenha o conteúdo
+        if (correspondencia && correspondencia.length > 1) {
+            conteudo = correspondencia[1];
+            findImg(game)
+        } else {
+            img = './img/hardlevel_bg.jpg';
+        }        
+        setCover(event, img);
+    }
+
+    async function findImg(game) {
+        const mobby = require('../functions/mobby');
+        try {
+            const result = await mobby.mobby.gameCover(game);
+            img = result;
+            return img;
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    async function setCover(event, img) {
+        console.log(img);
+        console.log(event);
+        event.edit({image: img})
+            .catch(console.error);
     }
 
     //a função abaixo funciona, serve para forçar excluir mensagens mesmo que sejam mais antigas de 14 dias

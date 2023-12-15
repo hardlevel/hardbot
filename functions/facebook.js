@@ -1,12 +1,9 @@
 const { facebook_token, facebook_secret } = require('../config.json');
 const crypto = require('crypto');
-//const querystring = require('node:querystring'); 
 
-module.exports = async (message) => {
+module.exports = async (message, image) => {
     const appsecret_proof = crypto.createHmac('sha256', facebook_secret).update(facebook_token).digest('hex');
-    
     const baseUrl = "https://graph.facebook.com/"
-    
     // const params = {
     //     message,
     //     appsecret_proof,
@@ -16,7 +13,7 @@ module.exports = async (message) => {
     // const options = {
     //     method: 'POST',
     //     body: JSON.stringify(params),
-    //     headers: { 'Content-Type': 'application/json' }
+    //     headers: { 'Content-Type': 'multipart/form-data' }
     // }
 
     // try {
@@ -35,7 +32,17 @@ module.exports = async (message) => {
             console.log(url);
             const response = await fetch(url, {
                 method: 'post',
-                body: JSON.stringify({access_token: facebook_token, appsecret_proof, message}),
+                body: JSON.stringify({
+                    access_token: facebook_token, 
+                    message,
+                    link:'https://hdlvl.dev/s/discord',
+                    call_to_action:{
+                        type:"OPEN_LINK",
+                        value:{
+                            link:'https://hdlvl.dev/s/discord'
+                        }
+                    }
+                }),
                 headers: { "Content-Type": "application/json" }
             });
             const data = await response.json();

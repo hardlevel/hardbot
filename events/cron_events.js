@@ -73,8 +73,8 @@ module.exports = async (client) => {
         bulkDelete(memesId)
     })
 
-    cron.schedule('* * * * *', () => {
-    //cron.schedule('0 17 * * *', () => {
+    //cron.schedule('* * * * *', () => {
+    cron.schedule('0 17 * * *', () => {
         const createdEvents = guild.scheduledEvents.fetch().then(events => {
             events.forEach(event => {
                 const description = event.description;

@@ -112,3 +112,4 @@ config.json
 .vscode
 ./logs/error.log
 ./logs/server.log
+./logs

@@ -11,7 +11,7 @@ module.exports = async (client) => {
     //0 0 * * 1
     //var job = cron.schedule('0 20 * * 2', () => {
     //cron.schedule('* * * * *', () => {
-    cron.schedule('10 17 * * *', () => {
+    cron.schedule('15 17 * * *', () => {
     //cron.schedule('0 19 * * TUE', () => {
     //cron.schedule('* * * * MON', () => {
         console.log('Criando evento do delta!')
@@ -52,8 +52,8 @@ module.exports = async (client) => {
             const text = `Novo evento de PS2 online criado! Marque para não perder! ${event.url}`
             client.channels.cache.get(generalChatId).send(text)
             client.channels.cache.get(ps2OnlineId).send(text)
-        })
-        console.log('evento criado')
+        }).catch(error => console.log(error));
+        console.log('evento criado');
     })
 
     // cron.schedule('*/30 * * * *', () =>{

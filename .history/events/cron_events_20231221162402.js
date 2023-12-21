@@ -10,8 +10,7 @@ module.exports = async (client) => {
     const guild = client.guilds.cache.get(serverId)
     //0 0 * * 1
     //var job = cron.schedule('0 20 * * 2', () => {
-    //cron.schedule('* * * * *', () => {
-    cron.schedule('30 16 * * *', () => {
+    cron.schedule('* * * * *', () => {
     //cron.schedule('0 19 * * TUE', () => {
     //cron.schedule('* * * * MON', () => {
         console.log('Criando evento do delta!')

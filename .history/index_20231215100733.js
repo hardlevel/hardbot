@@ -1,4 +1,3 @@
-global.baseDir = __dirname;
 require('dotenv').config();
 const {
     Client,

@@ -4,15 +4,14 @@ const cron = require('node-cron');
 const { Guilds, ChannelManager } = require('discord.js');
 const { generalChatId, ps2OnlineId, serverId, memesId, ifttt_key } = require('../config.json');
 const axios = require('axios');
-const console = require('../functions/logger').console;
+const console = require('./util/Loggers').console;
 
 module.exports = async (client) => {
     const guild = client.guilds.cache.get(serverId)
     //0 0 * * 1
     //var job = cron.schedule('0 20 * * 2', () => {
     //cron.schedule('* * * * *', () => {
-    cron.schedule('30 16 * * *', () => {
-    //cron.schedule('0 19 * * TUE', () => {
+    cron.schedule('0 19 * * TUE', () => {
     //cron.schedule('* * * * MON', () => {
         console.log('Criando evento do delta!')
         // Lógica para calcular a data das terças-feiras às 19h

@@ -11,7 +11,7 @@ module.exports = async (client) => {
     //0 0 * * 1
     //var job = cron.schedule('0 20 * * 2', () => {
     //cron.schedule('* * * * *', () => {
-    cron.schedule('46 17 * * *', () => {
+    cron.schedule('50 17 * * *', () => {
     //cron.schedule('0 19 * * TUE', () => {
     //cron.schedule('* * * * MON', () => {
         console.log('Criando evento do delta!')

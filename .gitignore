@@ -110,5 +110,5 @@ old_files
 config.json
 .history
 .vscode
-./logs
-/logs
+./logs/error.log
+./logs/server.log

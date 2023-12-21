@@ -11,8 +11,8 @@ module.exports = async (client) => {
     //0 0 * * 1
     //var job = cron.schedule('0 20 * * 2', () => {
     //cron.schedule('* * * * *', () => {
-    cron.schedule('32 17 * * *', () => {
-    //cron.schedule('0 19 * * TUE', () => {
+    //cron.schedule('32 17 * * *', () => {
+    cron.schedule('0 19 * * TUE', () => {
     //cron.schedule('* * * * MON', () => {
         console.log('Criando evento do delta!')
         // Lógica para calcular a data das terças-feiras às 19h

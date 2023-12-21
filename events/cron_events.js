@@ -7,11 +7,11 @@ const axios = require('axios');
 const console = require('../functions/logger').console;
 
 module.exports = async (client) => {
-    const guild = client.guilds.cache.get(serverId)
+    const guild = client.guilds.cache.get(serverId);
     //0 0 * * 1
     //var job = cron.schedule('0 20 * * 2', () => {
     //cron.schedule('* * * * *', () => {
-    cron.schedule('00 17 * * *', () => {
+    cron.schedule('05 17 * * *', () => {
     //cron.schedule('0 19 * * TUE', () => {
     //cron.schedule('* * * * MON', () => {
         console.log('Criando evento do delta!')
@@ -63,7 +63,7 @@ module.exports = async (client) => {
     // })
 
     cron.schedule('0 0 * * MON', () => {
-    //cron.schedule('* * * * *', () => {    
+    //cron.schedule('* * * * *', () => {
         async function bulkDelete(memesId){
             const channel = await client.channels.fetch(memesId);
             const messages = await channel.messages.fetch();
@@ -73,7 +73,7 @@ module.exports = async (client) => {
             ).catch(error => console.log(error))
         }
         bulkDelete(memesId)
-    })
+    });
 
     //cron.schedule('* * * * *', () => {
     cron.schedule('0 17 * * *', () => {
@@ -105,7 +105,7 @@ module.exports = async (client) => {
                 } else {console.log('não tem evento!');}
             })
         })
-    })
+    });
 
     cron.schedule('0 8 * * *', () => {
         //console.log('hora da gif!')

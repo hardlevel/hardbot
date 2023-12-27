@@ -40,15 +40,15 @@ const client = new Client({
 const fs = require('node:fs');
 const path = require('node:path');
 const util = require('util');
-const axios = require('axios')
+const axios = require('axios');
 //const facebook = require('./functions/facebook')();
 //const telegramText = require('./functions/telegram_sendtext')();
 //const youtube = require('./functions/youtube')("opl");
-const messages = require('./handlers/messages')
+const messages = require('./handlers/messages');
 //const startBot = require('./modules/startBot')
 
-let rulesChannel = ''
-var tentativas = {}
+let rulesChannel = '';
+var tentativas = {};
 
 const AuthenticationToken = process.env.DISCORD_TOKEN;
 if (!AuthenticationToken) {

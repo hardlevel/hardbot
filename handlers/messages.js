@@ -1,4 +1,4 @@
-const { client } = require('../index')
+//const { client } = require('../index')
 const alertForum = "Seu post em nosso forum não pode ser aprovado pois o título possui palavras não permitidas ou é curto demais, por favor leia as regras com atenção antes de enviar mensagens no server. \n Mensagens com titulos extremamente vagos que não detalham o problema não serão aprovados!"
 const filter = ['ajuda', 'ajude', 'me ajuda', 'socorro', 'urgente']
 const { MessageManager, EmbedBuilder, GuildMember, GuildMemberManager } = require('discord.js')
@@ -8,7 +8,7 @@ const fetch = require('node-fetch');
 
 module.exports = (client) => {
     client.on('messageCreate', async message => {
-        //console.log(message)
+        console.log(message)
         const roles = ['538803451812118538', '538803569005166602', '594656987237711892', '758085659272675329'];
         const oplRoom = '1145723573839867975';
         const author = message.author;

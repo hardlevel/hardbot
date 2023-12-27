@@ -8,7 +8,7 @@ const fetch = require('node-fetch');
 
 module.exports = (client) => {
     client.on('messageCreate', async message => {
-        console.log(message)
+        //console.log(message)
         const roles = ['538803451812118538', '538803569005166602', '594656987237711892', '758085659272675329'];
         const oplRoom = '1145723573839867975';
         const author = message.author;
@@ -81,9 +81,9 @@ module.exports = (client) => {
                 if (match) {
                     //console.log(match.input)
                     const url = match.input;
-                    console.log('link do aliexpress encontrado! ', url);
+                    //console.log('link do aliexpress encontrado! ', url);
                     (async function (){
-                        console.log('url na função ', url);
+                        //console.log('url na função ', url);
                         //{
                             //getProductId(url)
                             //getShotUrl(productId)
@@ -104,7 +104,7 @@ module.exports = (client) => {
                             const urlMatches = content.match(searchTerm);
                             if (urlMatches && urlMatches.length > 0) {
                                 const url = urlMatches[0];
-                                console.log('link da amazon encontrado! ', url)
+                                //console.log('link da amazon encontrado! ', url)
                                 getAmazonId(url, message)
                             }
                         }
@@ -169,7 +169,7 @@ async function getAmazonId(url, message){
         //let path = url.pathname
         let params = url.searchParams
         let id = params.get('pd_rd_i')
-        console.log(id)
+        //console.log(id)
         getAmazonProduct(id, message)
     }).catch(error => console.log(error))
 }

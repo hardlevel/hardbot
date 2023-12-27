@@ -11,7 +11,7 @@ module.exports = async (client) => {
     //0 0 * * 1
     //var job = cron.schedule('0 20 * * 2', () => {
     //cron.schedule('* * * * *', () => {
-    cron.schedule('50 17 * * *', () => {
+    cron.schedule('20 15 * * *', () => {
     //cron.schedule('0 19 * * TUE', () => {
     //cron.schedule('* * * * MON', () => {
         console.log('Criando evento do delta!')
@@ -20,8 +20,8 @@ module.exports = async (client) => {
         const proximaTerca = new Date(hoje);
         proximaTerca.setDate(proximaTerca.getDate() + ((2 + 7 - hoje.getDay()) % 7)); // Próxima terça-feira
 
-        proximaTerca.setHours(19); // Define a hora para 19h
-        proximaTerca.setMinutes(0); // Define os minutos para 0 (opcional)
+        proximaTerca.setHours(20); // Define a hora para 19h
+        proximaTerca.setMinutes(30); // Define os minutos para 0 (opcional)
 
         // Converte a data para o formato ISO 8601
         const dataTercaISO8601 = proximaTerca.toISOString();

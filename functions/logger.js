@@ -6,10 +6,10 @@ const logsDir = path.join(baseDir + '/logs');
 
 if (!fs.existsSync(logsDir)) {
     fs.mkdirSync(logsDir, { recursive: true });
-    console.log('Directory created:', logsDir);
+    //console.log('Directory created:', logsDir);
 }
     else {
-    console.log("Directory exists!")
+    //console.log("Directory exists!")
 }
 
 const fileLog = fs.createWriteStream(logsDir + '/server.log', {flags : 'w'});

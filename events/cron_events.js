@@ -11,8 +11,8 @@ module.exports = async (client) => {
     //0 0 * * 1
     //var job = cron.schedule('0 20 * * 2', () => {
     //cron.schedule('* * * * *', () => {
-    cron.schedule('20 15 * * *', () => {
-    //cron.schedule('0 19 * * TUE', () => {
+    //cron.schedule('20 15 * * *', () => {
+    cron.schedule('0 20 * * TUE', () => {
     //cron.schedule('* * * * MON', () => {
         console.log('Criando evento do delta!')
         // Lógica para calcular a data das terças-feiras às 19h
@@ -76,7 +76,7 @@ module.exports = async (client) => {
     });
 
     //cron.schedule('* * * * *', () => {
-    cron.schedule('0 17 * * *', () => {
+    cron.schedule('* * * * *', () => {
         const createdEvents = guild.scheduledEvents.fetch().then(events => {
             events.forEach(event => {
                 const description = event.description;
@@ -97,11 +97,11 @@ module.exports = async (client) => {
                     console.log('tem evento!')
                     const text = `Hoje tem evento de PS2 Online! Marca ai! Começando ${hour}:${minutes}\n`+
                         `Evento: ${event.name}`;
-                    client.channels.cache.get(generalChatId).send(text)
-                    client.channels.cache.get(ps2OnlineId).send(text)
+                    //client.channels.cache.get(generalChatId).send(text)
+                    //client.channels.cache.get(ps2OnlineId).send(text)
                     sendToTelegram(event.name, hour, minutes);
-                    sendToFacebook(event.name, hour, minutes, image);
-                    sendToTwitter(event.name, hour, minutes, ifttt_key);
+                    //sendToFacebook(event.name, hour, minutes, image);
+                    //sendToTwitter(event.name, hour, minutes, ifttt_key);
                 } else {console.log('não tem evento!');}
             })
         })
@@ -209,7 +209,7 @@ module.exports = async (client) => {
         await sendFacebookGroups(message, fbPost);
     }
 
-    async function sendToTelegram(name, hour, minutes) {
+    async function sendToTelegram(name, hour, minutes) {        
         const telegram = require('../functions/telegram_sendtext')
         const text = `Hoje tem partida de PS2 Online no nosso discord!\n`+
                 `Evento: ${name}\n`+

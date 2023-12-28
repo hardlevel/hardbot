@@ -113,3 +113,4 @@ config.json
 ./logs/error.log
 ./logs/server.log
 ./logs
+./datanase/database.sqlite

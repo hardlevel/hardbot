@@ -47,9 +47,6 @@ const axios = require('axios');
 const messages = require('./handlers/messages');
 //const startBot = require('./modules/startBot')
 
-let rulesChannel = '';
-var tentativas = {};
-
 const AuthenticationToken = process.env.DISCORD_TOKEN;
 if (!AuthenticationToken) {
     console.warn("[CRASH] Authentication Token for Discord bot is required! Use Envrionment Secrets or config.js.".red)
@@ -76,8 +73,6 @@ process.on('unhandledRejection', async (err, promise) => {
 //const { handleMessage } = require('./modules/messageHandler');
 
 const { token, noobId, serverId, botId, urlRegex, rulesChannelId, generalChatId } = require('./config')
-
-
 
 client.once(Events.ClientReady, c => {
     //console.log(`Ready! Logged in as ${c.user.tag}`);

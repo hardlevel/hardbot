@@ -37,23 +37,17 @@ const client = new Client({
         status: 'dnd'
     }
 });
+const { token, noobId, serverId, botId, urlRegex, rulesChannelId, generalChatId } = require('./config')
 const fs = require('node:fs');
 const path = require('node:path');
-const util = require('util');
-const axios = require('axios');
-//const facebook = require('./functions/facebook')();
-//const telegramText = require('./functions/telegram_sendtext')();
-//const youtube = require('./functions/youtube')("opl");
 const messages = require('./handlers/messages');
-//const startBot = require('./modules/startBot')
-
 const AuthenticationToken = process.env.DISCORD_TOKEN;
 if (!AuthenticationToken) {
     console.warn("[CRASH] Authentication Token for Discord bot is required! Use Envrionment Secrets or config.js.".red)
     //return process.exit();
 };
-
-//module.exports = client;
+// const games = require('./src/controllers/gamesController');
+//games.add();
 
 // Login to the bot:
 client.login(AuthenticationToken)
@@ -68,11 +62,6 @@ process.on('unhandledRejection', async (err, promise) => {
     console.error(`[ANTI-CRASH] Unhandled Rejection: ${err}`.red);
     console.error(promise);
 });
-
-//importar modulos
-//const { handleMessage } = require('./modules/messageHandler');
-
-const { token, noobId, serverId, botId, urlRegex, rulesChannelId, generalChatId } = require('./config')
 
 client.once(Events.ClientReady, c => {
     //console.log(`Ready! Logged in as ${c.user.tag}`);
@@ -172,3 +161,20 @@ client.on('interactionCreate', async interaction => {
 // getItemsRequest['Resources'] = ['Images.Primary.Medium', 'ItemInfo.Title', 'Offers.Listings.Price'];
 
 // api.getItems(getItemsRequest).then(response => console.log(response.ItemsResult))
+
+
+
+// async function getMobyGamePlatform(){
+
+//       const { getMultiGames } = require('./functions/mobby');  
+//       try {
+//         const game = await getMultiGames('ps1', 'ps2');
+//         return game;
+//         // client.channels.cache.get(generalChatId).send(text)
+//       } catch (error) {
+//         console.error(error);
+//       }
+
+// }
+// // getMobyGamePlatform().then(record => console.log(record));
+// console.log(getMobyGamePlatform());

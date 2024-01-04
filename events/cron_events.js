@@ -1,7 +1,7 @@
 
 
 const cron = require('node-cron');
-const { Guilds, ChannelManager } = require('discord.js');
+const { Guilds, ChannelManager, EmbedBuilder } = require('discord.js');
 const { generalChatId, ps2OnlineId, serverId, memesId, ifttt_key } = require('../config.json');
 const axios = require('axios');
 const console = require('../functions/logger').console;
@@ -76,7 +76,7 @@ module.exports = async (client) => {
     });
 
     //cron.schedule('* * * * *', () => {
-    cron.schedule('* * * * *', () => {
+    cron.schedule('0 17 * * *', () => {
         const createdEvents = guild.scheduledEvents.fetch().then(events => {
             events.forEach(event => {
                 const description = event.description;
@@ -97,11 +97,11 @@ module.exports = async (client) => {
                     console.log('tem evento!')
                     const text = `Hoje tem evento de PS2 Online! Marca ai! Começando ${hour}:${minutes}\n`+
                         `Evento: ${event.name}`;
-                    //client.channels.cache.get(generalChatId).send(text)
-                    //client.channels.cache.get(ps2OnlineId).send(text)
+                    client.channels.cache.get(generalChatId).send(text);
+                    client.channels.cache.get(ps2OnlineId).send(text);
                     sendToTelegram(event.name, hour, minutes);
-                    //sendToFacebook(event.name, hour, minutes, image);
-                    //sendToTwitter(event.name, hour, minutes, ifttt_key);
+                    sendToFacebook(event.name, hour, minutes, image);
+                    sendToTwitter(event.name, hour, minutes, ifttt_key);
                 } else {console.log('não tem evento!');}
             })
         })
@@ -185,7 +185,66 @@ module.exports = async (client) => {
     //cron.schedule('* * * * *', () => {
     //    sendFacebookGroups('hello world!');
     //});
+    cron.schedule('0 12 * * *', async () => {
+      const { todayGame } = require('../functions/mobby');
+      try {
+        const game = await todayGame().then(record => {
+          const data = record.rows[0];
+          const date = new Date(data.releaseDate);
+          const releaseYear = date.getYear();
+          const todayYear = new Date().getYear();
+          const diff = todayYear - releaseYear;
+          // console.log(date.toLocaleDateString('en-GB'));
+          // console.log(diff);
+          // console.log(date);
+          //console.log(data);
+          const capinha = new EmbedBuilder()
+            .setColor(0x0099FF)
+            .setTitle('Jogo do dia!')
+            .setURL('https://youtube.com/playmaniahl')
+            .setDescription(`Esse jogo foi lançado na data de hoje há exatos ${diff} anos atrás!`)
+            .addFields(
+              { name: 'Jogo', value: data.title },
+              { name: 'Plataforma', value: data.platform },
+              { name: 'Lançamento', value: date.toLocaleDateString('en-GB'), inline: true },
+            )
+            .setImage((data.cover))
+            .setFooter({ text: 'Se inscreva https://youtube.com/playmaniahl', iconURL: data.cover});
+          //client.channels.cache.get(generalChatId).send(text, { files: [record.rows[0].cover] }).attachFiles([record.rows[0].cover]);
+          client.channels.cache.get(generalChatId).send({ embeds: [capinha] });
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    });
 
+    cron.schedule('30 16 * * *', async () => {      
+      const { getMultiGames } = require('../functions/mobby');
+      try {
+        const game = await getMultiGames('ps1', 'ps2').then(record => {
+          const data = record.rows[0];
+          const capinha = new EmbedBuilder()
+            .setColor(0x0099FF)
+            .setTitle('Capinha do dia!')
+            .setURL('https://youtube.com/playmaniahl')
+            .setDescription('Aqui está a capinha do dia especialmente para você que ama capinhas <3')            
+            .addFields(
+              { name: 'Jogo', value: data.title },
+              { name: 'Plataforma', value: data.platform.toUpperCase() },
+              { name: 'Lançamento', value: data.releaseDate, inline: true },
+            )
+            .setImage((data.cover))
+            .setFooter({ text: 'Se inscreva https://youtube.com/playmaniahl', iconURL: data.cover});
+          //client.channels.cache.get(generalChatId).send(text, { files: [record.rows[0].cover] }).attachFiles([record.rows[0].cover]);
+          client.channels.cache.get(generalChatId).send({ embeds: [capinha] });
+        }).catch(err => console.log(err));
+        return game;
+        // 
+      } catch (error) {
+        console.error(error);
+      }
+    });
+    
     const sendFacebookGroups = async (message) => {
         console.log('enviando para grupos');
         const fb = require('../functions/fbgroups');
@@ -274,6 +333,8 @@ module.exports = async (client) => {
         event.edit({image: img})
             .catch(console.error);
     }
+
+    
 
     //a função abaixo funciona, serve para forçar excluir mensagens mesmo que sejam mais antigas de 14 dias
     //descomentar apenas caso seja necessário usa-la

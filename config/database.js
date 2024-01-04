@@ -1,13 +1,13 @@
-const { Sequelize } = require('sequelize');
+const Sequelize  = require('sequelize');
+const path  = require('path');
+const dbFile = path.resolve(__dirname, '../database/database.sqlite');
 
-// Option 2: Passing parameters separately (sqlite)
 const sequelize = new Sequelize({
     dialect: 'sqlite',
-    storage: baseDir + '/database/database.sqlite'
+    storage: dbFile
 });
 
-sequelize.authenticate().then(() => {
-  console.log('Connection has been established successfully.');
-}).catch((error) => {
-  console.error('Unable to connect to the database: ', error);
-});
+module.exports = {
+  Sequelize: Sequelize,
+  sequelize: sequelize
+}

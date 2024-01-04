@@ -14,9 +14,9 @@ module.exports = (client) => {
         const author = message.author;
         const content = message.content;
         const channel = client.channels.cache.get(message.channelId);
-        const perguntaTxt = `pergunta: substantivo feminino
-            palavra ou frase com que se faz uma interrogação.
-            questão que se submete a alguém de quem se espera que a resolva.`;
+        const perguntaTxt = `pergunta: substantivo feminino\n`+
+            `palavra ou frase com que se faz uma interrogação.\n`+
+            `questão que se submete a alguém de quem se espera que a resolva.`;
         if(message.channelId == '1145723573839867975'){
             const downloader = require('./downloader')()
         }
@@ -26,9 +26,9 @@ module.exports = (client) => {
         } else {
             //console.log('não é mensagem de bot')
             //console.log(author)
-            const memberHasRole = (member) => {                
-                roles.forEach(item => {                                    
-                    member.roles.cache.some(role => {                        
+            const memberHasRole = (member) => {
+                roles.forEach(item => {
+                    member.roles.cache.some(role => {
                         role.id === item
                     });
                 })
@@ -60,7 +60,7 @@ module.exports = (client) => {
                 ]
                 if (message.channelId == '538756978420219905'){
                     if(terms.some(term => content.includes(term))){
-                        message.reply("Não use esse chat para tiruar duvidas de tutoriais ou solucionar problemas! Use as salas apropriadas para cada assunto! leia as <#538757121538392075>")
+                        message.reply("Não use esse chat para tirar duvidas de tutoriais ou solucionar problemas! Use as salas apropriadas para cada assunto! leia as <#538757121538392075>")
                     }
                     if(content.includes("sou novo")){
                         message.reply("Seja bem vindo ao nosso server, por favor certifique-se de ter lido atentamente as <#538757121538392075>, respeite o tema de cada sala")

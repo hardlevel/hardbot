@@ -11,7 +11,7 @@ module.exports = (client) => {
         //console.log(message)
         const roles = ['538803451812118538', '538803569005166602', '594656987237711892', '758085659272675329'];
         const oplRoom = '1145723573839867975';
-        const author = message.author;
+        const author = message.author;        
         const content = message.content;
         const channel = client.channels.cache.get(message.channelId);
         const perguntaTxt = `pergunta: substantivo feminino\n`+
@@ -21,7 +21,7 @@ module.exports = (client) => {
             const downloader = require('./downloader')()
         }
         if (author == true){
-            //console.log('é mensagem de um bot')
+            console.log('é mensagem de um bot')
             return;
         } else {
             //console.log('não é mensagem de bot')
@@ -34,7 +34,7 @@ module.exports = (client) => {
                 })
             }
             //console.log(memberHasRole);
-            if(!memberHasRole(message.member)){
+            if(!memberHasRole(message.member) && author != '1063528592648192011'){
                 if (message.channelId == '538756978420219905'){
                     if (content.includes('pergunta') && (content.includes('duvida') || content.includes('dúvida'))){
                         message.reply(`De acordo com o dicionário, a definição de pergunta:\n\n${perguntaTxt}\n\nPor gentileza, não meta o louco`)

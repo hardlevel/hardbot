@@ -218,7 +218,7 @@ module.exports = async (client) => {
       }
     });
 
-    cron.schedule('30 16 * * *', async () => {      
+    cron.schedule('30 16 * * *', async () => {
       const { getMultiGames } = require('../functions/mobby');
       try {
         const game = await getMultiGames('ps1', 'ps2').then(record => {

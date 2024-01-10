@@ -143,7 +143,7 @@ function checkPermissions(file, test = 0) {
       }
     });
   } else {
-    console.error('Não foi possível alterar as permissões do arquivo!');
+    console.error('Não foi possível alterar as permissões do arquivo! ', file);
   }
 }
 function setPermissions(file, test){

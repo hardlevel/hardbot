@@ -201,6 +201,7 @@ async function getGamesPlatform(platform) {
 }
 
 async function todayGame() {
+  console.log('jogo do dia 2');
   const game = await games.getTodayGame();
   return game;
 }

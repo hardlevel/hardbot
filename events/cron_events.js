@@ -185,12 +185,12 @@ module.exports = async (client) => {
     //cron.schedule('* * * * *', () => {
     //    sendFacebookGroups('hello world!');
     //});
-    cron.schedule('* * * * *', async () => {
-    //cron.schedule('0 12 * * *', async () => {
-      console.log('jogo do dia!');
+
+    cron.schedule('0 12 * * *', async () => {      
       const { todayGame } = require('../functions/mobby');
       try {
         const game = await todayGame().then(record => {
+          console.log('jogo do dia 1');
           const data = record.rows[0];
           const date = new Date(data.releaseDate);
           const releaseYear = date.getYear();

@@ -214,11 +214,11 @@ module.exports = async (client) => {
           client.channels.cache.get(generalChatId).send({ embeds: [capinha] });
         });
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
     });
 
-    cron.schedule('30 16 * * *', async () => {
+    cron.schedule('* 2 * * *', async () => {
       const { getMultiGames } = require('../functions/mobby');
       try {
         const game = await getMultiGames('ps1', 'ps2').then(record => {

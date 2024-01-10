@@ -4,12 +4,13 @@ const path = require('path');
 
 const logsDir = path.join(baseDir + '/logs');
 
-if (!fs.existsSync(logsDir)) {
-    fs.mkdirSync(logsDir, { recursive: true });
-    //console.log('Directory created:', logsDir);
-}
-    else {
-    //console.log("Directory exists!")
+try {
+  if (!fs.existsSync(logsDir)) {
+      fs.mkdirSync(logsDir, { recursive: true });
+      //console.log('Directory created:', logsDir);
+  }
+} catch (error) {
+  console.error(error.message);
 }
 
 const fileLog = fs.createWriteStream(logsDir + '/server.log', {flags : 'w'});

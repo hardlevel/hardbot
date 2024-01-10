@@ -39,6 +39,7 @@ const client = new Client({
 });
 const { token, noobId, serverId, botId, urlRegex, rulesChannelId, generalChatId } = require('./config')
 const fs = require('node:fs');
+const { access, constants } = require('node:fs');
 const path = require('node:path');
 const messages = require('./handlers/messages');
 const AuthenticationToken = process.env.DISCORD_TOKEN;
@@ -128,6 +129,34 @@ client.on('interactionCreate', async interaction => {
         await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
     }
 });
+
+const files = ['./logs/error.log', './logs/server.log', './data/pin.json', './database/database.sqlite'];
+files.forEach(file => {
+  checkPermissions(file);
+})
+function checkPermissions(file, test = 0) {
+  if (test < 2) {
+      access(file, constants.R_OK | constants.W_OK, (err) => {
+      console.log(`${file} ${err ? 'is not' : 'is'} readable and writable`);
+      if (err) {
+        setPermissions(file, test);
+      }
+    });
+  } else {
+    console.error('Não foi possível alterar as permissões do arquivo!');
+  }
+}
+function setPermissions(file, test){
+  test++
+  fs.chown(file, 1001, 27, (error) => { 
+    if (error) 
+      console.log("Error Code:", error); 
+    else
+      console.log("uid and gid set successfully");
+      checkPermissions(file, test);
+  });
+}
+
 
 //fetch('https://amzn.to/43RUROk').then(response => console.log(response))
 

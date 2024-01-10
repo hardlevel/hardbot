@@ -220,7 +220,7 @@ module.exports = async (client) => {
       }
     });
 
-    cron.schedule('* * * * *', async () => {
+    cron.schedule('30 16 * * *', async () => {
       console.log('Hora da capinha!');
       const { getMultiGames } = require('../functions/mobby');
       try {

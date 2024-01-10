@@ -185,7 +185,9 @@ module.exports = async (client) => {
     //cron.schedule('* * * * *', () => {
     //    sendFacebookGroups('hello world!');
     //});
-    cron.schedule('0 12 * * *', async () => {
+    cron.schedule('* * * * *', async () => {
+    //cron.schedule('0 12 * * *', async () => {
+      console.log('jogo do dia!');
       const { todayGame } = require('../functions/mobby');
       try {
         const game = await todayGame().then(record => {
@@ -219,6 +221,7 @@ module.exports = async (client) => {
     });
 
     cron.schedule('* 2 * * *', async () => {
+      console.log('Hora da capinha!');
       const { getMultiGames } = require('../functions/mobby');
       try {
         const game = await getMultiGames('ps1', 'ps2').then(record => {
@@ -239,7 +242,6 @@ module.exports = async (client) => {
           client.channels.cache.get(generalChatId).send({ embeds: [capinha] });
         }).catch(err => console.log(err));
         return game;
-        // 
       } catch (error) {
         console.error(error);
       }

@@ -24,7 +24,9 @@
   "description": "bot para o server do discord do hardlevel",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "update": "git pull",
+    "start": "pm2 start ecosystem.config.js",
+    "dev": "nodemon"
   },
   "keywords": [
     "hardbot"

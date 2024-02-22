@@ -148,7 +148,7 @@ function checkPermissions(file, test = 0) {
 }
 function setPermissions(file, test){
   test++
-  fs.chown(file, 1001, 27, (error) => { 
+  fs.chown(file, 1001, 116, (error) => { 
     if (error) 
       console.log("Error Code:", error); 
     else

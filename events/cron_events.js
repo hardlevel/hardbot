@@ -10,10 +10,9 @@ module.exports = async (client) => {
     const guild = client.guilds.cache.get(serverId);
     //0 0 * * 1
     //var job = cron.schedule('0 20 * * 2', () => {
-    //cron.schedule('* * * * *', () => {
     //cron.schedule('20 15 * * *', () => {
-    cron.schedule('0 20 * * TUE', () => {
-    //cron.schedule('* * * * MON', () => {
+    //cron.schedule('0 20 * * TUE', () => {
+    cron.schedule('* * * * *', () => {
         console.log('Criando evento do delta!')
         // Lógica para calcular a data das terças-feiras às 19h
         const hoje = new Date();
@@ -25,7 +24,7 @@ module.exports = async (client) => {
 
         // Converte a data para o formato ISO 8601
         const dataTercaISO8601 = proximaTerca.toISOString();
-
+        console.log(dataTercaISO8601);
         // Chama sua função passando o parâmetro dataTercaISO8601
 
         //client.user.setUsername('ABOC');
@@ -220,8 +219,7 @@ module.exports = async (client) => {
       }
     });
 
-    cron.schedule('30 16 * * *', async () => {
-      console.log('Hora da capinha!');
+    cron.schedule('30 16 * * *', async () => {      
       const { getMultiGames } = require('../functions/mobby');
       try {
         const game = await getMultiGames('ps1', 'ps2').then(record => {
@@ -338,9 +336,9 @@ module.exports = async (client) => {
 
     
 
-    //a função abaixo funciona, serve para forçar excluir mensagens mesmo que sejam mais antigas de 14 dias
-    //descomentar apenas caso seja necessário usa-la
-    //console.log('limpando mensagens ', memesId)
+    // a função abaixo funciona, serve para forçar excluir mensagens mesmo que sejam mais antigas de 14 dias
+    // descomentar apenas caso seja necessário usa-la
+    // console.log('limpando mensagens ', memesId)
     // async function forceBulkDelete(memesId){
     //     const channel = await client.channels.fetch(memesId);
     //     const messages = await channel.messages.fetch().then(messages => {

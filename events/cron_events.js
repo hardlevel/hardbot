@@ -35,7 +35,7 @@ module.exports = async (client) => {
             entityType: 2,
             channel: '591729371539046421',
             image: 'img/delta.webp',
-            description: `Todas as terças às 19h teremos Delta Force Black Hawk Down Online!\n\n`+
+            description: `Todas as terças às 20:30h teremos Delta Force Black Hawk Down Online!\n\n`+
 
                 `DNS:45.7.228.197\n\n`+
 

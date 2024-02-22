@@ -132,7 +132,14 @@ client.on('interactionCreate', async interaction => {
 
 const files = ['./logs/error.log', './logs/server.log', './data/pin.json', './database/database.sqlite'];
 files.forEach(file => {
-  checkPermissions(file);
+  let ext = path.extname(file);  
+  if (fs.existsSync(file)) {
+    if (ext == '.log') {
+      fs.unlinkSync(file);
+    } else {
+      checkPermissions(file);
+    }
+  }
 })
 function checkPermissions(file, test = 0) {
   if (test < 2) {

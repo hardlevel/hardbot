@@ -10,7 +10,8 @@ try {
       //console.log('Directory created:', logsDir);
   }
 } catch (error) {
-  console.error(error.message);
+  let date = new Date();
+  console.error(date, error.message);
 }
 
 const fileLog = fs.createWriteStream(logsDir + '/server.log', {flags : 'w'});
@@ -19,14 +20,16 @@ const logOutput = process.stdout;
 
 
 // the flag 'a' will update the stream log at every launch
-console.log  = (e) => { 
-    fileLog.write(util.format(e) + '\n');
-    logOutput.write(util.format(e) + '\n');
+console.log  = (e) => {
+  let date = new Date();
+  fileLog.write(util.format(date + ' | log: ' + e) + '\n');
+  logOutput.write(util.format(date + ' | log: ' + e) + '\n');
 };
 
 
 console.error = (e) => {
-    ErrorLog.write(util.format(e) + '\n');
+  let date = new Date();
+  ErrorLog.write(util.format(date + ' | error: ' + e) + '\n');
 }
 
 

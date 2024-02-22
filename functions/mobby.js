@@ -200,8 +200,7 @@ async function getGamesPlatform(platform) {
   return gamesCollection;
 }
 
-async function todayGame() {
-  console.log('jogo do dia 2');
+async function todayGame() {  
   const game = await games.getTodayGame();
   return game;
 }

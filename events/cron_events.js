@@ -11,8 +11,8 @@ module.exports = async (client) => {
     //0 0 * * 1
     //var job = cron.schedule('0 20 * * 2', () => {
     //cron.schedule('20 15 * * *', () => {
-    //cron.schedule('0 20 * * TUE', () => {
-    cron.schedule('* * * * *', () => {
+    cron.schedule('0 20 * * 2', () => {
+    //cron.schedule('* * * * *', () => {
         console.log('Criando evento do delta!')
         // Lógica para calcular a data das terças-feiras às 19h
         const hoje = new Date();
@@ -61,7 +61,7 @@ module.exports = async (client) => {
     //     }
     // })
 
-    cron.schedule('0 0 * * MON', () => {
+    cron.schedule('0 0 * * 1', () => {
     //cron.schedule('* * * * *', () => {
         async function bulkDelete(memesId){
             const channel = await client.channels.fetch(memesId);

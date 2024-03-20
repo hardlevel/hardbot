@@ -16,9 +16,10 @@ module.exports = async (client) => {
         console.log('Criando evento do delta!')
         // Lógica para calcular a data das terças-feiras às 19h
         const hoje = new Date();
-        const proximaTerca = new Date(hoje);
-        proximaTerca.setDate(proximaTerca.getDate() + ((2 + 7 - hoje.getDay()) % 7)); // Próxima terça-feira
-
+        const proximaTerca = new Date();
+				proximaTerca.setDate(proximaTerca.getDate() + 7);
+        //proximaTerca.setDate(proximaTerca.getDate() + ((2 + 7 - hoje.getDay()) % 7)); // Próxima terça-feira
+				proximaTerca.setDate(nextWeek.getDate() + 7);
         proximaTerca.setHours(20); // Define a hora para 19h
         proximaTerca.setMinutes(30); // Define os minutos para 0 (opcional)
 
@@ -35,7 +36,7 @@ module.exports = async (client) => {
             entityType: 2,
             channel: '591729371539046421',
             image: 'img/delta.webp',
-            description: `Todas as terças às 20:30h teremos Delta Force Black Hawk Down Online!\n\n`+
+            description: `Todas as terças às 20:00h teremos Delta Force Black Hawk Down Online!\n\n`+
 
                 `DNS:45.7.228.197\n\n`+
 
@@ -79,7 +80,12 @@ module.exports = async (client) => {
         const createdEvents = guild.scheduledEvents.fetch().then(events => {
             events.forEach(event => {
                 const description = event.description;
-                const image = event.coverImageURL() || getCover(description, event);
+								let image = event.coverImageURL();
+								if (image) {
+									image = event.coverImageURL().replace('.jpg','.jpg?size=4096').replace('.webp','.jpg?size=4096').replace('.png','.jpg?size=4096');
+								} else {
+									image = getCover(description, event);
+								}
                 const eventDate = event.scheduledStartAt;
                 const today = new Date();
                 const day = eventDate.getDate();
@@ -93,7 +99,7 @@ module.exports = async (client) => {
                     month == today.getMonth() &&
                     year == today.getYear()
                 if (todayEvent == true) {
-                    console.log('tem evento!')
+                    console.log('tem evento!');
                     const text = `Hoje tem evento de PS2 Online! Marca ai! Começando ${hour}:${minutes}\n`+
                         `Evento: ${event.name}`;
                     client.channels.cache.get(generalChatId).send(text);
@@ -128,7 +134,7 @@ module.exports = async (client) => {
                 sendGifToChannel(generalChatId);
                 // Enviar a gif para o canal do Discord
                 //client.channels.cache.get(generalChatId).send(`Bom dia! flores do dia! ${gifUrl}`)
-                
+
                 // if (channel && channel.isText()) {
                 //     channel.send(`Bom dia! flores do dia! ${gifUrl}`);
                 // }
@@ -161,7 +167,7 @@ module.exports = async (client) => {
                 sendGifToChannel(generalChatId);
                 // Enviar a gif para o canal do Discord
                 //client.channels.cache.get(generalChatId).send(`Bom dia! flores do dia! ${gifUrl}`)
-                
+
                 // if (channel && channel.isText()) {
                 //     channel.send(`Bom dia! flores do dia! ${gifUrl}`);
                 // }
@@ -185,7 +191,7 @@ module.exports = async (client) => {
     //    sendFacebookGroups('hello world!');
     //});
 
-    cron.schedule('0 12 * * *', async () => {      
+    cron.schedule('0 12 * * *', async () => {
       const { todayGame } = require('../functions/mobby');
       try {
         const game = await todayGame().then(record => {
@@ -219,7 +225,7 @@ module.exports = async (client) => {
       }
     });
 
-    cron.schedule('30 16 * * *', async () => {      
+    cron.schedule('30 16 * * *', async () => {
       const { getMultiGames } = require('../functions/mobby');
       try {
         const game = await getMultiGames('ps1', 'ps2').then(record => {
@@ -228,7 +234,7 @@ module.exports = async (client) => {
             .setColor(0x0099FF)
             .setTitle('Capinha do dia!')
             .setURL('https://youtube.com/playmaniahl')
-            .setDescription('Aqui está a capinha do dia especialmente para você que ama capinhas <3')            
+            .setDescription('Aqui está a capinha do dia especialmente para você que ama capinhas <3')
             .addFields(
               { name: 'Jogo', value: data.title },
               { name: 'Plataforma', value: data.platform.toUpperCase() },
@@ -244,11 +250,11 @@ module.exports = async (client) => {
         console.error(error);
       }
     });
-    
-    const sendFacebookGroups = async (message) => {
+
+    const sendFacebookGroups = async (message, image) => {
         console.log('enviando para grupos');
         const fb = require('../functions/fbgroups');
-        const response = await fb(message);
+        const response = await fb(message, image);
         //const respondeBody = await response.json()
     }
 
@@ -261,14 +267,13 @@ module.exports = async (client) => {
         `Nossas lives em:\n`+
         `https://hdlvl.dev/s/playmania\n`+
         `https://twitch.tv/venaogames\n\n`+
-
         `Siga nas demais redes: https://linktr.ee/hardlevel`;
-        console.log('enviando para pagina');
+        //console.log('enviando para pagina');
         const fbPost = await facebook(message, image);
-        await sendFacebookGroups(message, fbPost);
+        await sendFacebookGroups(message, image);
     }
 
-    async function sendToTelegram(name, hour, minutes) {        
+    async function sendToTelegram(name, hour, minutes) {
         const telegram = require('../functions/telegram_sendtext')
         const text = `Hoje tem partida de PS2 Online no nosso discord!\n`+
                 `Evento: ${name}\n`+
@@ -293,7 +298,7 @@ module.exports = async (client) => {
                 },
                 body: JSON.stringify(data)
             });
-    
+
             //const response = await ifttt.json();
             //console.log(response);
         } catch (error) {
@@ -312,7 +317,7 @@ module.exports = async (client) => {
             findImg(game)
         } else {
             img = './img/hardlevel_bg.jpg';
-        }        
+        }
         setCover(event, img);
     }
 
@@ -334,7 +339,7 @@ module.exports = async (client) => {
             .catch(console.error);
     }
 
-    
+
 
     // a função abaixo funciona, serve para forçar excluir mensagens mesmo que sejam mais antigas de 14 dias
     // descomentar apenas caso seja necessário usa-la

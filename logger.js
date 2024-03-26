@@ -6,9 +6,8 @@ const myFormat = printf(({ level, message, timestamp, stack }) => {
   return `${timestamp} [${level}]: ${message} ${stack}`;
 });
 
-const container = new winston.Container();
 
-container.add('logger', {
+const logger = winston.createLogger({
     // format: winston.format.combine(
     //     winston.format.errors({ stack: true }),
     //     winston.format.json()
@@ -27,6 +26,10 @@ container.add('logger', {
         new winston.transports.File({ filename: 'logs/info.log', level: 'info' }),
     ],
 });
+if (process.env.NODE_ENV !== 'production') {
+    logger.add(new winston.transports.Console({
+        format: winston.format.simple()
+    }));
+}
 
-const logger = container.get('logger');
 module.exports = logger;

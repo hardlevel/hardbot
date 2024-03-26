@@ -5,7 +5,7 @@ const { Guilds, ChannelManager, EmbedBuilder } = require('discord.js');
 const { generalChatId, ps2OnlineId, serverId, memesId, ifttt_key } = require('../config.json');
 const axios = require('axios');
 //const console = require('../functions/logger').console;
-
+const winston = require('winston');
 module.exports = async (client) => {
     const guild = client.guilds.cache.get(serverId);
     //0 0 * * 1
@@ -65,7 +65,7 @@ module.exports = async (client) => {
     //     }
     // })
 
-    cron.schedule('35 16 * * 2', () => {
+    cron.schedule('43 16 * * 2', () => {
     //cron.schedule('* * * * *', () => {
         async function bulkDelete(memesId){
             const channel = await client.channels.fetch(memesId);

@@ -1,7 +1,7 @@
 const { telegram_chatId, telegram_token } = require('../config.json');
 //const crypto = require('crypto');
 //const querystring = require('node:querystring');
-
+const winston = require('winston');
 module.exports = async (message) => {
     const baseUrl = `https://api.telegram.org/bot${telegram_token}/sendPhoto`;
 

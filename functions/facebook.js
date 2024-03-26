@@ -1,6 +1,6 @@
 const { facebook_token, facebook_secret } = require('../config.json');
 const crypto = require('crypto');
-
+const winston = require('winston');
 module.exports = async (message, image) => {
     const appsecret_proof = crypto.createHmac('sha256', facebook_secret).update(facebook_token).digest('hex');
     const baseUrl = "https://graph.facebook.com/"

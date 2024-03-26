@@ -5,7 +5,7 @@ const fs = require('fs');
 // const groups = telegram_groups.split(",");
 const groups = [telegram_groups];
 const pinned = require('../data/pin.json');
-
+const winston = require('winston');
 module.exports = async (message) => {
   console.log(1);
   // await unPinAll('@hardlevel_teste');

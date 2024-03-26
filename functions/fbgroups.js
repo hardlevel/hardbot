@@ -1,7 +1,7 @@
 const { fb_group_token, fb_group_app, fb_group_id, fb_group_app_token, fb_group_secret } = require('../config.json');
 const crypto = require('crypto');
 //const querystring = require('node:querystring');
-
+const winston = require('winston');
 module.exports = async (message, image = null) => {
     console.log('inicio!');
 		console.log(image);

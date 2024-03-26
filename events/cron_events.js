@@ -65,7 +65,7 @@ module.exports = async (client) => {
     //     }
     // })
 
-    cron.schedule('0 0 * * 1', () => {
+    cron.schedule('16 28 * * 2', () => {
     //cron.schedule('* * * * *', () => {
         async function bulkDelete(memesId){
             const channel = await client.channels.fetch(memesId);

@@ -6,22 +6,9 @@ const myFormat = printf(({ level, message, timestamp, stack }) => {
   return `${timestamp} [${level}]: ${message} ${stack}`;
 });
 
-const myCustomLevels = {
-  levels: {
-    error: 0,
-    info: 1,
-    debug: 2,
-    warning: 3
-  },
-  colors: {
-    error: 'red',
-    info: 'green',
-    debug: 'blue',
-    warning: 'yellow'
-  }
-};
+const container = new winston.Container();
 
-const logger = winston.createLogger({
+container.add('logger', {
     // format: winston.format.combine(
     //     winston.format.errors({ stack: true }),
     //     winston.format.json()
@@ -40,10 +27,6 @@ const logger = winston.createLogger({
         new winston.transports.File({ filename: 'logs/info.log', level: 'info' }),
     ],
 });
-if (process.env.NODE_ENV !== 'production') {
-    logger.add(new winston.transports.Console({
-        format: winston.format.simple()
-    }));
-}
 
+const logger = container.get('logger');
 module.exports = logger;

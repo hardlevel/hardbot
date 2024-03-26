@@ -4,7 +4,7 @@ const cron = require('node-cron');
 const { Guilds, ChannelManager, EmbedBuilder } = require('discord.js');
 const { generalChatId, ps2OnlineId, serverId, memesId, ifttt_key } = require('../config.json');
 const axios = require('axios');
-const console = require('../functions/logger').console;
+//const console = require('../functions/logger').console;
 
 module.exports = async (client) => {
     const guild = client.guilds.cache.get(serverId);
@@ -52,8 +52,11 @@ module.exports = async (client) => {
             const text = `Novo evento de PS2 online criado! Marque para não perder! ${event.url}`
             client.channels.cache.get(generalChatId).send(text)
             client.channels.cache.get(ps2OnlineId).send(text)
-            console.log('evento criado');
-        }).catch(error => console.log(error));
+            logger.info('Evento Delta criado');
+        }).catch(error => {
+					console.log(error)
+					logger.error(error);
+				});
     })
 
     // cron.schedule('*/30 * * * *', () =>{
@@ -68,11 +71,15 @@ module.exports = async (client) => {
             const channel = await client.channels.fetch(memesId);
             const messages = await channel.messages.fetch();
             //console.log(messages.size, messages);
-            channel.bulkDelete(messages.size).then(
-                channel.send('https://media.giphy.com/media/26gscNQHswYio5RBu/giphy-downsized-large.gif')
-            ).catch(error => console.log(error))
+            channel.bulkDelete(messages.size).then(()=>{
+                channel.send('https://media.giphy.com/media/26gscNQHswYio5RBu/giphy-downsized-large.gif');
+								logger.info(`Mensagens ${messages.length} apagadas`);
+						}).catch(error => {
+							console.log(error);
+							logger.error(error);
+						})
         }
-        bulkDelete(memesId)
+        bulkDelete(memesId);
     });
 
     //cron.schedule('* * * * *', () => {
@@ -107,6 +114,7 @@ module.exports = async (client) => {
                     sendToTelegram(event.name, hour, minutes);
                     sendToFacebook(event.name, hour, minutes, image);
                     sendToTwitter(event.name, hour, minutes, ifttt_key);
+										logger.info('Evento do dia identificado e compartilhado nas redes sociais')
                 } else {console.log('não tem evento!');}
             })
         })

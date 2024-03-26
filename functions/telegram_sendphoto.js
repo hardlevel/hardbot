@@ -1,12 +1,12 @@
 const { telegram_chatId, telegram_token } = require('../config.json');
 //const crypto = require('crypto');
-//const querystring = require('node:querystring'); 
+//const querystring = require('node:querystring');
 
 module.exports = async (message) => {
     const baseUrl = `https://api.telegram.org/bot${telegram_token}/sendPhoto`;
 
     message.chat_id = telegram_chatId;
-    
+
     const options = {
         method: 'POST',
         body: JSON.stringify(message),
@@ -22,6 +22,7 @@ module.exports = async (message) => {
         return response;
     } catch (error) {
         console.log(error);
+				logger.error(error);
         return error.message
     }
 }

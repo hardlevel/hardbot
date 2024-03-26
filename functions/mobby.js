@@ -4,7 +4,7 @@ const { stringify } = require('querystring');
 // ps1 = 6, ps2 = 7, ps3 = 81, ps4 = 141, ps5 = 288, psp = 46, psvita = 105
 
 //const crypto = require('crypto');
-//const querystring = require('node:querystring'); 
+//const querystring = require('node:querystring');
 
 async function gameDetails (title) {
     const baseUrl = new URL('https://api.mobygames.com/v1/games');
@@ -17,7 +17,7 @@ async function gameDetails (title) {
     baseUrl.search = stringify(params);
     const options = {
         method: 'GET',
-        headers: { 
+        headers: {
             'Content-Type': 'application/json',
             'Accept': 'application/json'
         }
@@ -33,6 +33,7 @@ async function gameDetails (title) {
         return responseBody;
     } catch (error) {
         console.log(error);
+				logger.error(error);
         return error.message
     }
 }
@@ -48,7 +49,7 @@ async function gameCover (title) {
     baseUrl.search = stringify(params);
     const options = {
         method: 'GET',
-        headers: { 
+        headers: {
             'Content-Type': 'application/json',
             'Accept': 'application/json'
         }
@@ -64,6 +65,7 @@ async function gameCover (title) {
         return responseBody.games[0].sample_cover.image;
     } catch (error) {
         console.log(error);
+				logger.error(error);
         return error.message
     }
 }
@@ -116,6 +118,7 @@ async function getGames(platform) {
         return responseBody.games.length === 100; // Continue apenas se houver 100 registros
       }
     } catch (error) {
+			logger.error(error);
       console.log(error);
 
       if (error.message.includes('Rate limit exceeded')) {
@@ -200,12 +203,12 @@ async function getGamesPlatform(platform) {
   return gamesCollection;
 }
 
-async function todayGame() {  
+async function todayGame() {
   const game = await games.getTodayGame();
   return game;
 }
 
-async function getMultiGames(...platform) {  
+async function getMultiGames(...platform) {
   const game = await games.getGamesMultiPlatform(...platform);
   return game;
 }

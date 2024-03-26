@@ -36,6 +36,7 @@ module.exports = async (message, image = null) => {
                 results.push(data);
             } catch (error) {
                 console.log(error);
+								logger.error(error);
                 return error.message
             }
         }

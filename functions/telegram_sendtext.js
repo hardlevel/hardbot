@@ -37,11 +37,12 @@ async function sendMessage(options) {
   }
   catch (error) {
     console.log(error);
+		logger.error(error);
     return error.message;
   }
 }
 
-async function pinMessage(chat_id, message_id) {  
+async function pinMessage(chat_id, message_id) {
   try {
     const stored = await storeData(chat_id, message_id);
     const options = {
@@ -63,7 +64,7 @@ async function pinMessage(chat_id, message_id) {
 
 async function unPinAll(chat_id) {
   console.log(4);
-  try {    
+  try {
     const options = {
       method: 'POST',
       body: JSON.stringify({ chat_id }),

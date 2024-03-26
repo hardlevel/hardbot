@@ -33,7 +33,7 @@ module.exports = async (message, image) => {
             const response = await fetch(url, {
                 method: 'post',
                 body: JSON.stringify({
-                    access_token: facebook_token, 
+                    access_token: facebook_token,
                     message,
                     link:'https://hdlvl.dev/s/discord',
                     call_to_action:{
@@ -50,6 +50,7 @@ module.exports = async (message, image) => {
             results.push(data);
         } catch (error) {
             console.log(error);
+						logger.error(error);
             return error.message
         }
     }

@@ -1,4 +1,5 @@
 global.baseDir = __dirname;
+const logger = require('./logger');
 require('dotenv').config();
 const {
     Client,
@@ -37,7 +38,7 @@ const client = new Client({
         status: 'dnd'
     }
 });
-const { token, noobId, serverId, botId, urlRegex, rulesChannelId, generalChatId } = require('./config')
+//const { token, noobId, serverId, botId, urlRegex, rulesChannelId, generalChatId } = require('./config')
 const fs = require('node:fs');
 const { access, constants } = require('node:fs');
 const path = require('node:path');
@@ -132,7 +133,7 @@ client.on('interactionCreate', async interaction => {
 
 const files = ['./logs/error.log', './logs/server.log', './data/pin.json', './database/database.sqlite'];
 files.forEach(file => {
-  let ext = path.extname(file);  
+  let ext = path.extname(file);
   if (fs.existsSync(file)) {
     if (ext == '.log') {
       fs.unlinkSync(file);
@@ -155,9 +156,9 @@ function checkPermissions(file, test = 0) {
 }
 function setPermissions(file, test){
   test++
-  fs.chown(file, 1001, 116, (error) => { 
-    if (error) 
-      console.log("Error Code:", error); 
+  fs.chown(file, 1001, 116, (error) => {
+    if (error)
+      console.log("Error Code:", error);
     else
       console.log("uid and gid set successfully");
       checkPermissions(file, test);
@@ -202,7 +203,7 @@ function setPermissions(file, test){
 
 // async function getMobyGamePlatform(){
 
-//       const { getMultiGames } = require('./functions/mobby');  
+//       const { getMultiGames } = require('./functions/mobby');
 //       try {
 //         const game = await getMultiGames('ps1', 'ps2');
 //         return game;

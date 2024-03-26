@@ -1,7 +1,7 @@
 //const crypto = require('crypto');
 //const querystring = require('node:querystring');
 const { api_token } = require('../config.json');
-const winston = require('winston');
+const logger = require("../logger");
 module.exports = async (id) => {
     let token = encodeURIComponent(api_token);
     //console.log('id recebida para api: ', id);

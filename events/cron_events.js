@@ -5,7 +5,7 @@ const { Guilds, ChannelManager, EmbedBuilder } = require('discord.js');
 const { generalChatId, ps2OnlineId, serverId, memesId, ifttt_key } = require('../config.json');
 const axios = require('axios');
 //const console = require('../functions/logger').console;
-const winston = require('winston');
+const logger = require("../logger");
 module.exports = async (client) => {
     const guild = client.guilds.cache.get(serverId);
     //0 0 * * 1
@@ -65,15 +65,15 @@ module.exports = async (client) => {
     //     }
     // })
 
-    cron.schedule('43 16 * * 2', () => {
+    cron.schedule('0 0 * * 1', () => {
     //cron.schedule('* * * * *', () => {
         async function bulkDelete(memesId){
             const channel = await client.channels.fetch(memesId);
             const messages = await channel.messages.fetch();
-            //console.log(messages.size, messages);
+            console.log(messages.size);
             channel.bulkDelete(messages.size).then(()=>{
                 channel.send('https://media.giphy.com/media/26gscNQHswYio5RBu/giphy-downsized-large.gif');
-								logger.info(`Mensagens ${messages.length} apagadas`);
+								logger.info(`Mensagens ${messages.size} apagadas`);
 						}).catch(error => {
 							console.log(error);
 							logger.error(error);
@@ -346,8 +346,6 @@ module.exports = async (client) => {
         event.edit({image: img})
             .catch(console.error);
     }
-
-
 
     // a função abaixo funciona, serve para forçar excluir mensagens mesmo que sejam mais antigas de 14 dias
     // descomentar apenas caso seja necessário usa-la

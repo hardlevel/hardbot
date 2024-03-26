@@ -215,3 +215,4 @@ function setPermissions(file, test){
 // }
 // // getMobyGamePlatform().then(record => console.log(record));
 // console.log(getMobyGamePlatform());
+logger.info('log iniciado!');

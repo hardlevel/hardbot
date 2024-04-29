@@ -11,7 +11,7 @@ module.exports = (client) => {
         //console.log(message)
         const roles = ['538803451812118538', '538803569005166602', '594656987237711892', '758085659272675329'];
         const oplRoom = '1145723573839867975';
-        const author = message.author;        
+        const author = message.author;
         const content = message.content;
         const channel = client.channels.cache.get(message.channelId);
         const perguntaTxt = `pergunta: substantivo feminino\n`+
@@ -49,11 +49,11 @@ module.exports = (client) => {
                     }
                 }
                 const terms = [
-                    'tenho duvida', 
-                    'tenho dúvida', 
-                    'tenho uma dúvida', 
-                    'tenho uma duvida', 
-                    'tirar dúvida', 
+                    'tenho duvida',
+                    'tenho dúvida',
+                    'tenho uma dúvida',
+                    'tenho uma duvida',
+                    'tirar dúvida',
                     'tirar duvida',
                     'tira duvida',
                     'tira dúvida',
@@ -87,12 +87,12 @@ module.exports = (client) => {
                         //{
                             //getProductId(url)
                             //getShotUrl(productId)
-                            //replyMsg(message, productId, data)                                
+                            //replyMsg(message, productId, data)
                                 const productId = await getProductId(url);
                                 const data = await getShortUrl(productId);
                                 await replyMsg(message, productId, data);
                                 //const productId = await getProductId(url)
-                                //console.log('Meta: ' + metaData.image)                    
+                                //console.log('Meta: ' + metaData.image)
                         //    } catch (err) {
                         //        console.log(err)
                         //}
@@ -231,7 +231,7 @@ async function getShortUrl(id) {
     const ali = require('../functions/ali_api');
     const res = await(ali(id));
     let data = {};
-    if(res.erro){
+    if(res.error){
         data.error = "Este produto não possui suporte a link afiliado, use o link original"
     } else {
         //console.log(await res.erro);
